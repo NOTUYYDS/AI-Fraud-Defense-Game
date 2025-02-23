@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>別信！這是騙局：AI欺詐大作戰</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="game-container">
+        <!-- 標題畫面 -->
+        <div id="title-screen" class="screen active">
+            <img src="assets/images/backgrounds/campus_bg.png" class="parallax-bg">
+            <img src="assets/images/characters/呱呱_正常.png" class="main-character">
+            <button id="start-btn" class="pixel-button">開始冒險</button>
+        </div>
+        
+        <!-- 關卡容器 -->
+        <div id="level-container" class="screen"></div>
+    </div>
+
+    <!-- 音效 -->
+    <audio id="bgm" src="assets/sounds/bgm.mp3" loop></audio>
+    <audio id="click-sfx" src="assets/sounds/click.mp3"></audio>
+
+    <script src="script.js"></script>
+    <script src="levels/voice-scam.js"></script>
+    <script src="levels/deepfake.js"></script>
+    <script src="levels/investment.js"></script>
+    <script src="levels/text-scam.js"></script>
+</body>
+</html>
