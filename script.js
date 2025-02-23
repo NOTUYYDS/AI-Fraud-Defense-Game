@@ -65,6 +65,10 @@ class GameState {
         return '哎呀～要多提高警覺才行啊！';
     }
 }
+function clearLevelContainer() {
+    const levelContainer = document.getElementById('level-container');
+    levelContainer.innerHTML = ''; // 清除內容
+}
 
 // 初始化遊戲
 GameState.init();
