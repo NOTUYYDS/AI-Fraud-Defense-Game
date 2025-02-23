@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="zh-Hant-TW">
 <head>
     <meta charset="UTF-8">
@@ -47,8 +46,8 @@
         /* 角色定位 */
         .main-character {
             position: absolute;
-            right: 30px; /* 更改人物位置，讓角色更接近對話框 */
-            bottom: 100px;  /* 更改底部位置，使角色更接近對話框 */
+            right: 20px;
+            bottom: 240px;  /* 根據對話框高度調整 */
             width: 200px;
             z-index: 3;
             transform: translateY(0);
@@ -64,7 +63,7 @@
             max-width: 600px;
             background: white;
             border-radius: 15px;
-            padding: 30px 20px; /* 增加上下內邊距，使對話框更長 */
+            padding: 20px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             z-index: 2;
         }
@@ -72,7 +71,7 @@
         .dialog-content {
             position: relative;
             padding-right: 120px; /* 留出角色空間 */
-            min-height: 180px; /* 增加對話框最小高度，讓它更長 */
+            min-height: 120px;
         }
 
         /* 按鈕樣式 */
@@ -226,6 +225,7 @@
                     case 4: TextScamLevel.init(); break;
                     default: this.showEnding();
                 }
+
 
                 document.getElementById('level-container').classList.add('active');
             }
