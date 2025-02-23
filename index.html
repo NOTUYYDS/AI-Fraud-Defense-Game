@@ -134,30 +134,24 @@
             padding: 30px;
         }
     </style>
-
 </head>
 <body>
     <main id="game-container">
-        <!-- 標題區塊（含半透明黑色背景） -->
-        <div id="title-container">
-            <h1 id="game-title">別信！這是騙局：AI欺詐大作戰</h1>
-            <h2 id="game-subtitle">113-2 屏大 AI 創作應用競賽暨成果展：AI x 生活</h2>
-        </div>
-
-        <!-- 音樂開關按鈕（左上角） -->
-        <button id="music-toggle">🔇</button>
-
-        <!-- 背景 -->
+        <!-- 標題畫面 -->
         <header id="title-screen" class="screen active">
             <img src="campus_bg.png" alt="校園背景" class="parallax-bg">
             <div class="dialog-box">
-@@ -184,284 +126,206 @@ <h2 id="game-subtitle">113-2 屏大 AI 創作應用競賽暨成果展：AI x 生
+                <div class="dialog-content">
+                    <img src="呱呱.PNG" alt="主角呱呱" class="main-character">
+                    <div id="dialog-text">
+                        <p>我叫呱呱，是今年剛進入屏東大學的大一新鴨！</p>
+                        <button id="start-btn" class="pixel-button">開始冒險</button>
+                    </div>
+                </div>
             </div>
         </header>
-
-        <!-- 固定呱呱在右下角（放大＆左移） -->
-        <img src="呱呱.PNG" alt="主角呱呱" class="main-character">
-
+        
+        <!-- 關卡容器 -->
         <div id="level-container" class="screen"></div>
     </main>
 
@@ -166,75 +160,131 @@
     <audio id="click-sfx" src="click.mp3"></audio>
 
     <script>
+        // GameState 遊戲狀態管理
         class GameState {
             static currentLevel = 1;
             static score = 0;
-            static isMusicPlaying = false;
+            static soundCache = new Map();
 
             static init() {
-                document.getElementById('start-btn').addEventListener('click', () => this.loadLevel(1));
-                document.getElementById('music-toggle').addEventListener('click', () => this.toggleMusic());
-                const musicButton = document.getElementById('music-toggle');
-                musicButton.addEventListener('click', () => {
-                    this.toggleMusic();
+                this.playBGM();
+                this.setupEventListeners();
+            }
+
+            static setupEventListeners() {
+                // 動態綁定按鈕事件
+                document.addEventListener('click', e => {
+                    if (e.target.matches('#start-btn')) {
+                        this.playSound('click-sfx');
+                        this.showIntroduction();
+                    }
                 });
-
-                // 初始化音樂按鈕狀態
-                this.updateMusicButton();
-                document.getElementById('bgm').play().catch(() => {});
-                this.isMusicPlaying = true;
             }
 
-            static toggleMusic() {
-                const bgm = document.getElementById('bgm');
-                this.isMusicPlaying ? bgm.pause() : bgm.play();
-                if (this.isMusicPlaying) {
-                    bgm.pause();
-                } else {
-                    bgm.play().catch(console.error);
+            static async showIntroduction() {
+                const dialogs = [
+                    "聽說這間學校的校長是牛奶糖，不知道是不是真的呢？🍬",
+                    "最近學校裡出現了好多詐騙事件...",
+                    "我需要你的幫助來識破這些騙局！",
+                    "準備好了嗎？讓我們一起打擊詐騙吧！🦆"
+                ];
+
+                const dialogBox = document.querySelector('#dialog-text');
+                dialogBox.innerHTML = ''; // 清空初始內容
+
+                // 逐步顯示對話
+                for (const text of dialogs) {
+                    await this.typeText(dialogBox, text);
+                    await new Promise(r => setTimeout(r, 1500));
                 }
-                this.isMusicPlaying = !this.isMusicPlaying;
-                this.updateMusicButton();
+
+                // 顯示開始按鈕
+                dialogBox.innerHTML += `<button class="pixel-button" id="start-game-btn">開始挑戰！</button>`;
+                document.getElementById('start-game-btn').addEventListener('click', () => {
+                    this.loadLevel(1);
+                });
             }
 
-            static updateMusicButton() {
-                document.getElementById('music-toggle').textContent = this.isMusicPlaying ? '🔊' : '🔇';
+            static typeText(container, text) {
+                return new Promise(resolve => {
+                    let index = 0;
+                    const typing = setInterval(() => {
+                        container.innerHTML = `<p>${text.slice(0, index)}</p>`;
+                        if (index++ >= text.length) {
+                            clearInterval(typing);
+                            resolve();
+                        }
+                    }, 50);
+                });
             }
 
             static playSound(soundId) {
-                const sound = document.getElementById(soundId);
+                if (!this.soundCache.has(soundId)) {
+                    this.soundCache.set(soundId, new Audio(`${soundId}.mp3`));
+                }
+                const sound = this.soundCache.get(soundId);
                 sound.currentTime = 0;
-                sound.play().catch(() => {});
+                sound.play().catch(console.error);
             }
 
-            static loadLevel(level) {
-                this.currentLevel = level;
-                const container = document.getElementById('level-container');
-                container.style.display = 'block';
-                container.innerHTML = '';
+            static playBGM() {
+                const bgm = document.getElementById('bgm');
+                bgm.volume = 0.3;
+                bgm.play().catch(console.error);
+            }
 
-                switch(level) {
+            static loadLevel(levelId) {
+                this.currentLevel = levelId;
+                document.getElementById('title-screen').classList.remove('active');
+                this.clearLevelContainer();
+
+                switch(levelId) {
                     case 1: VoiceScamLevel.init(); break;
                     case 2: DeepfakeLevel.init(); break;
                     case 3: InvestmentScamLevel.init(); break;
                     case 4: TextScamLevel.init(); break;
                     default: this.showEnding();
                 }
+
+                document.getElementById('level-container').classList.add('active');
+            }
+
+            static clearLevelContainer() {
+                const container = document.getElementById('level-container');
+                while (container.firstChild) {
+                    container.removeChild(container.firstChild);
+                }
             }
 
             static showEnding() {
-                const container = document.getElementById('level-container');
-                container.innerHTML = `
+                const endingHtml = `
                     <div class="ending-screen">
-                        <h2>遊戲結束！</h2>
-                        <p>最終得分：${this.score} 分</p>
+                        <h2>${this.getEndingTitle()}</h2>
+                        <img src="${this.score >= 300 ? '呱呱_開心.png' : '呱呱_受傷.png'}" 
+                             alt="結局角色" 
+                             style="width:200px;margin:20px">
+                        <div class="ending-text">
+                            <p>${this.getEndingText()}</p>
+                            <p>最終分數：${this.score} 分</p>
+                        </div>
                         <button onclick="location.reload()" class="pixel-button">再玩一次</button>
                     </div>
                 `;
-                const musicButton = document.getElementById('music-toggle');
-                musicButton.innerHTML = this.isMusicPlaying ? "🔊" : "🔇";
+                document.getElementById('level-container').innerHTML = endingHtml;
+            }
+
+            static getEndingTitle() {
+                return this.score >= 400 ? '🎉 防詐天才鴨' :
+                       this.score >= 300 ? '🛡️ 安全守護者' : '⚠️ 需要加強警戒';
+            }
+
+            static getEndingText() {
+                return this.score >= 400 ? '你簡直是鴨界福爾摩斯！所有陷阱都逃不過你的法眼！' :
+                       this.score >= 300 ? '厲害厲害！校園防詐就靠你守護啦～' :
+                       '哎呀～要多提高警覺才行啊！';
             }
         }
+
 
         class VoiceScamLevel {
             static init() {
