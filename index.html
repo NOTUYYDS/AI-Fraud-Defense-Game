@@ -6,7 +6,240 @@
     <title>防詐騙大冒險</title>
     <style>
         /* 样式定义 */
-        /* ...（您的现有CSS样式）... */
+<style>
+    /* 🌈 全局变量 */
+    :root {
+        --primary-color: #2A2A72;
+        --secondary-color: #009FFD;
+        --accent-color: #FF6B6B;
+        --text-light: #F8F9FA;
+        --glass-bg: rgba(255, 255, 255, 0.15);
+    }
+
+    /* 🎯 标题区增强 */
+    .header {
+        position: relative;
+        padding: 25px;
+        background: linear-gradient(135deg, var(--primary-color), #0F4C81);
+        color: var(--text-light);
+        font-size: 2.2rem;
+        text-align: center;
+        font-family: "jf open 粉圓", "Noto Sans TC", sans-serif;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        border-bottom: 3px solid var(--secondary-color);
+    }
+
+    .sub-header {
+        font-size: 1.1rem;
+        color: #C8D6E5;
+        margin-top: 8px;
+        letter-spacing: 1.5px;
+    }
+
+    /* 🐸 吉祥物动态效果 */
+    .frog {
+        position: fixed;
+        bottom: 30px;
+        right: 50px;
+        width: 160px;
+        filter: drop-shadow(0 8px 15px rgba(0, 0, 0, 0.2));
+        animation: float 3s ease-in-out infinite;
+        cursor: pointer;
+        transition: transform 0.3s;
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-20px); }
+    }
+
+    .frog:hover {
+        transform: rotate(-5deg) scale(1.05);
+    }
+
+    /* 🎮 游戏主容器 */
+    #game-container {
+        max-width: 1200px;
+        margin: 30px auto;
+        padding: 25px;
+        background: var(--glass-bg);
+        backdrop-filter: blur(10px);
+        border-radius: 15px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+
+    /* 🕹️ 音量按钮美化 */
+    .music-button {
+        position: fixed;
+        top: 25px;
+        left: 25px;
+        width: 45px;
+        height: 45px;
+        background: var(--glass-bg);
+        border: none;
+        border-radius: 50%;
+        backdrop-filter: blur(5px);
+        cursor: pointer;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .music-button i {
+        color: var(--text-light);
+        font-size: 1.4rem;
+    }
+
+    .music-button:hover {
+        background: rgba(255, 255, 255, 0.25);
+        transform: rotate(180deg) scale(1.1);
+    }
+
+    /* 📞 游戏关卡容器 */
+    #level-container {
+        margin: 2rem auto;
+        padding: 2rem;
+        background: var(--glass-bg);
+        border-radius: 15px;
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+
+    /* 🎮 选项按钮升级 */
+    .options button {
+        background: linear-gradient(135deg, var(--secondary-color), #00C9FF);
+        color: var(--text-light);
+        padding: 15px 30px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        margin: 15px;
+        font-size: 1.1rem;
+        transition: all 0.3s;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0, 201, 255, 0.3);
+    }
+
+    .options button::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+            120deg,
+            transparent,
+            rgba(255, 255, 255, 0.3),
+            transparent
+        );
+        transition: 0.5s;
+    }
+
+    .options button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0, 201, 255, 0.4);
+    }
+
+    .options button:hover::before {
+        left: 100%;
+    }
+
+    /* 🚨 诈骗警告动效 */
+    .damage-effect {
+        padding: 25px;
+        border-radius: 12px;
+        background: rgba(255, 107, 107, 0.15);
+        border: 2px solid var(--accent-color);
+        animation: pulse 1.5s infinite;
+        position: relative;
+    }
+
+    @keyframes pulse {
+        0% { box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.4); }
+        70% { box-shadow: 0 0 0 15px rgba(255, 107, 107, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(255, 107, 107, 0); }
+    }
+
+    /* 📹 影片区交互优化 */
+    .video-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 25px;
+        margin: 2rem 0;
+    }
+
+    .video {
+        background: var(--glass-bg);
+        border-radius: 12px;
+        padding: 15px;
+        cursor: pointer;
+        transition: all 0.3s;
+        position: relative;
+        overflow: hidden;
+        border: 2px solid transparent;
+    }
+
+    .video::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.3);
+        opacity: 0;
+        transition: 0.3s;
+    }
+
+    .video:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .video:hover::after {
+        opacity: 1;
+    }
+
+    .video[data-type="fake"]:hover {
+        border-color: var(--accent-color);
+    }
+
+    .video[data-type="real"]:hover {
+        border-color: #00C9A7;
+    }
+
+    /* 📱 响应式设计 */
+    @media (max-width: 768px) {
+        .header {
+            font-size: 1.8rem;
+            padding: 15px;
+        }
+
+        .frog {
+            width: 120px;
+            right: 20px;
+            bottom: 15px;
+        }
+
+        #game-container {
+            margin: 15px;
+            padding: 15px;
+        }
+
+        .options button {
+            padding: 12px 25px;
+            font-size: 1rem;
+            margin: 10px;
+        }
+    }
+</style>
     </style>
 </head>
 <body>
