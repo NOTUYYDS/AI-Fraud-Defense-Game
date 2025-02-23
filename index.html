@@ -20,10 +20,10 @@
 
         /* 標題樣式 */
         #game-title {
-            font-size: 42px; /* 增大字體 */
+            font-size: 42px;
             font-weight: bold;
-            text-align: center; /* 置中 */
-            color: #ff4500; /* 醒目的橘色 */
+            text-align: center;
+            color: #ff4500;
             margin: 20px 0;
             text-shadow: 3px 3px 5px rgba(0, 0, 0, 0.3);
         }
@@ -34,33 +34,35 @@
             height: 100vh;
         }
 
-        /* 標題畫面樣式 */
-        #title-screen {
-            position: relative;
-            height: 100%;
+        /* 背景音樂開關按鈕 */
+        #music-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 10px 15px;
+            font-size: 16px;
+            background: #008CBA;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
         }
 
-        .parallax-bg {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-            object-fit: cover;
+        #music-toggle:hover {
+            background: #0073a8;
         }
 
         /* 角色定位 */
         .main-character {
             position: absolute;
             right: 20px;
-            bottom: 240px;  /* 根據對話框高度調整 */
+            bottom: 240px;
             width: 200px;
             z-index: 3;
-            transform: translateY(0);
         }
 
-        /* 對話框系統 */
+        /* 對話框 */
         .dialog-box {
             position: absolute;
             bottom: 20px;
@@ -75,13 +77,6 @@
             z-index: 2;
         }
 
-        .dialog-content {
-            position: relative;
-            padding-right: 120px; /* 留出角色空間 */
-            min-height: 120px;
-        }
-
-        /* 按鈕樣式 */
         .pixel-button {
             display: inline-block;
             padding: 12px 24px;
@@ -97,11 +92,8 @@
 
         .pixel-button:hover {
             background: #45a049;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
 
-        /* 關卡容器 */
         .screen {
             display: none;
             position: absolute;
@@ -114,19 +106,15 @@
         .screen.active {
             display: block;
         }
-
-        /* 遊戲結束畫面 */
-        .ending-screen {
-            text-align: center;
-            padding: 30px;
-        }
     </style>
 </head>
 <body>
     <h1 id="game-title">別信！這是騙局：AI欺詐大作戰</h1>
     
+    <!-- 音樂開關按鈕 -->
+    <button id="music-toggle">🔊 開啟音樂</button>
+
     <main id="game-container">
-        <!-- 標題畫面 -->
         <header id="title-screen" class="screen active">
             <img src="campus_bg.png" alt="校園背景" class="parallax-bg">
             <div class="dialog-box">
@@ -140,19 +128,17 @@
             </div>
         </header>
         
-        <!-- 關卡容器 -->
         <div id="level-container" class="screen"></div>
     </main>
 
     <!-- 音效 -->
     <audio id="bgm" src="bgm.mp3" loop></audio>
-    <audio id="click-sfx" src="click.mp3"></audio>
 
     <script>
-        // 遊戲狀態管理
         class GameState {
             static currentLevel = 1;
             static score = 0;
+            static isMusicPlaying = false; // 控制音樂的狀態
 
             static init() {
                 this.setupEventListeners();
@@ -161,6 +147,10 @@
             static setupEventListeners() {
                 document.getElementById('start-btn').addEventListener('click', () => {
                     this.showIntroduction();
+                });
+
+                document.getElementById('music-toggle').addEventListener('click', () => {
+                    this.toggleMusic();
                 });
             }
 
@@ -203,12 +193,28 @@
                 document.getElementById('title-screen').classList.remove('active');
                 document.getElementById('level-container').classList.add('active');
             }
+
+            static toggleMusic() {
+                const bgm = document.getElementById('bgm');
+                const musicButton = document.getElementById('music-toggle');
+
+                if (this.isMusicPlaying) {
+                    bgm.pause();
+                    musicButton.innerHTML = "🔇 開啟音樂";
+                } else {
+                    bgm.play().catch(console.error);
+                    musicButton.innerHTML = "🔊 關閉音樂";
+                }
+
+                this.isMusicPlaying = !this.isMusicPlaying;
+            }
         }
 
         GameState.init();
     </script>
 </body>
 </html>
+
 
         // 第一關：語音詐騙
         class VoiceScamLevel {
