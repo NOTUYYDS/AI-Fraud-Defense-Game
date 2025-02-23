@@ -6,7 +6,7 @@
     <title>別信！這是騙局：AI欺詐大作戰</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         /* 全域樣式 */
         body {
@@ -15,50 +15,42 @@
             padding: 0;
             overflow: hidden;
             background-color: #f0f0f0;
+            text-align: center;
         }
 
         /* 標題容器 */
         #title-container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
+            position: relative;
             background: rgba(0, 0, 0, 0.6);
-            padding: 20px 0;
+            padding: 20px;
             text-align: center;
-            z-index: 10;
+            color: white;
         }
 
         #game-title {
             font-size: 48px;
             font-weight: 900;
-            color: white;
             margin: 0;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
         }
 
         #game-subtitle {
             font-size: 20px;
             font-weight: 700;
-            color: white;
             margin: 5px 0 0;
         }
 
-       /* 主角色樣式 */
-.main-character {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) scale(1.2);  /* 改為 1.2，縮小呱呱 */
-    z-index: 9;
-    transition: all 0.3s ease;
-    pointer-events: none;
-}
-
+        /* 主角色樣式 */
+        .main-character {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(1.2);
+            transition: all 0.3s ease;
+        }
 
         /* 對話框系統 */
         .dialog-box {
-            position: fixed;
+            position: absolute;
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
@@ -68,7 +60,6 @@
             border-radius: 20px;
             padding: 25px;
             box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-            z-index: 10;
         }
 
         .pixel-button {
@@ -85,7 +76,29 @@
         .pixel-button:hover {
             transform: translateY(-2px);
         }
+    </style>
+</head>
+<body>
+    <div id="title-container">
+        <h1 id="game-title">別信！這是騙局：AI欺詐大作戰</h1>
+        <h2 id="game-subtitle">113-2 屏大 AI 創作應用競賽暨成果展：AI x 生活</h2>
+    </div>
+    <main id="game-container">
+        <div class="dialog-box">
+            <p>我叫呱呱，是今年剛進入屏東大學的大一新鴨！</p>
+            <button id="start-btn" class="pixel-button">開始冒險</button>
+        </div>
+        <img src="呱呱.PNG" alt="主角呱呱" class="main-character">
+    </main>
+    <script>
+        document.getElementById("start-btn").addEventListener("click", function() {
+            alert("冒險開始！");
+        });
+    </script>
+</body>
+</html>
 
+    
         /* 關卡容器 */
         #level-container {
             position: fixed;
