@@ -44,6 +44,20 @@
             z-index: 1;
             object-fit: cover;
         }
+ /* 💬 對話框（在呱呱前方） */
+        .dialog-box {
+            position: absolute;
+            bottom: 120px; /* 略高於呱呱 */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            max-width: 500px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            font-size: 18px;
+        }
 
         /* 角色定位 */
         .main-character {
@@ -55,20 +69,7 @@
             transform: translateY(0);
         }
 
-        /* 對話框系統 */
-        .dialog-box {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80%;
-            max-width: 600px;
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            z-index: 2;
-        }
+      
 
         .dialog-content {
             position: relative;
