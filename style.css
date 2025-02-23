@@ -24,6 +24,7 @@ body {
     height: 100%;
     text-align: center;
     padding-top: 50px;
+    z-index: 10;
 }
 
 .main-character {
@@ -46,126 +47,19 @@ body {
     background: #4CAF50;
     color: white;
     border: none;
-    border-radius: 5px;
+    border-radius: 10px;
     cursor: pointer;
-    font-size: 1.2em;
+    font-size: 1.2rem;
     transition: background 0.3s;
+    position: relative;
+    z-index: 20;
 }
 
 .pixel-button:hover {
     background: #45a049;
 }
-/* 投資詐騙關卡 */
-.investment-ui {
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    max-width: 600px;
-    margin: 20px auto;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
 
-.red-flags {
-    display: flex;
-    justify-content: space-around;
-    margin: 20px 0;
-}
-
-.flag {
-    padding: 10px;
-    border: 2px solid #ccc;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: transform 0.2s;
-}
-
-.flag:hover {
-    transform: scale(1.05);
-}
-
-.flag.exposed {
-    border-color: #ff4444;
-}
-
-.report-btn {
-    background: #ff4444;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1em;
-    transition: background 0.3s;
-}
-
-.report-btn:hover {
-    background: #cc0000;
-}
-
-/* 文字詐騙關卡 */
-.browser-simulator {
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    max-width: 800px;
-    margin: 20px auto;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-.email-list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin: 20px 0;
-}
-
-.email {
-    padding: 10px;
-    border: 2px solid #ccc;
-    border-radius: 10px;
-    cursor: grab;
-    transition: transform 0.2s;
-}
-
-.email:hover {
-    transform: scale(1.02);
-}
-
-.drop-zone {
-    display: flex;
-    justify-content: space-around;
-    margin: 20px 0;
-}
-
-.zone {
-    padding: 20px;
-    border: 2px dashed #ccc;
-    border-radius: 10px;
-    text-align: center;
-    width: 45%;
-}
-
-.zone.legit {
-    border-color: #4CAF50;
-}
-
-.zone.phishing {
-    border-color: #ff4444;
-}
-
-/* 警告訊息 */
-.warning-message {
-    position: fixed;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: #ff4444;
-    color: white;
-    padding: 10px 20px;
-    border-radius: 5px;
-    z-index: 1000;
-}
-
+/* 背景圖片修正 */
 .parallax-bg {
     position: absolute;
     top: 0;
@@ -175,6 +69,8 @@ body {
     background-image: url('campus_bg-large.webp');
     background-size: cover;
     background-position: center;
+    z-index: -1; /* 降低層級，避免覆蓋按鈕 */
+    pointer-events: none; /* 確保點擊不被背景攔截 */
 }
 
 /* 手機版優化 */
@@ -184,49 +80,13 @@ body {
         background-size: contain;
         background-position: top;
     }
-}
-.parallax-bg {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background-image: url('campus_bg-large.webp');
-    background-size: cover;
-    background-position: center;
-}
-
-/* 手機版優化 */
-@media (max-width: 768px) {
-    .parallax-bg {
-        background-image: url('campus_bg-small.webp');
-        background-size: contain;
-        background-position: top;
-    }
-}
-.pixel-button {
-    font-size: 1.2rem;
-    padding: 12px 20px;
-    border-radius: 10px;
-}
-
-/* 手機版按鈕 */
-@media (max-width: 768px) {
+    
     .pixel-button {
         font-size: 1rem;
         padding: 10px 16px;
         width: 80%;
     }
-}
 
-/* 角色大小適應手機 */
-.main-character {
-    width: 60%;
-    max-width: 250px;
-}
-
-/* 手機版調整 */
-@media (max-width: 768px) {
     .main-character {
         width: 80%;
         max-width: 200px;
