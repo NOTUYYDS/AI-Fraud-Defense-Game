@@ -166,3 +166,69 @@ body {
     z-index: 1000;
 }
 
+.parallax-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-image: url('campus_bg-large.webp');
+    background-size: cover;
+    background-position: center;
+}
+
+/* 手機版優化 */
+@media (max-width: 768px) {
+    .parallax-bg {
+        background-image: url('campus_bg-small.webp');
+        background-size: contain;
+        background-position: top;
+    }
+}
+.parallax-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-image: url('campus_bg-large.webp');
+    background-size: cover;
+    background-position: center;
+}
+
+/* 手機版優化 */
+@media (max-width: 768px) {
+    .parallax-bg {
+        background-image: url('campus_bg-small.webp');
+        background-size: contain;
+        background-position: top;
+    }
+}
+.pixel-button {
+    font-size: 1.2rem;
+    padding: 12px 20px;
+    border-radius: 10px;
+}
+
+/* 手機版按鈕 */
+@media (max-width: 768px) {
+    .pixel-button {
+        font-size: 1rem;
+        padding: 10px 16px;
+        width: 80%;
+    }
+}
+
+/* 角色大小適應手機 */
+.main-character {
+    width: 60%;
+    max-width: 250px;
+}
+
+/* 手機版調整 */
+@media (max-width: 768px) {
+    .main-character {
+        width: 80%;
+        max-width: 200px;
+    }
+}
