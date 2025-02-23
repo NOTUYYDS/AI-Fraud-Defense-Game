@@ -6,7 +6,7 @@
     <title>別信！這是騙局：AI欺詐大作戰</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
     
     <style>
         /* 全域樣式 */
@@ -18,25 +18,42 @@
             overflow: hidden;
         }
 
-        /* 標題樣式（置於背景上方） */
-        #game-title {
+        /* 標題與標語的背景覆蓋（全寬） */
+        #title-container {
             position: absolute;
-            top: 10%;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 48px;
-            font-weight: bold;
-            color: white;
-            text-shadow: 4px 4px 6px rgba(0, 0, 0, 0.5);
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.6); /* 半透明黑色覆蓋 */
+            padding: 20px 0;
+            text-align: center;
             z-index: 10;
         }
 
+        /* 標題樣式 */
+        #game-title {
+            font-size: 48px;
+            font-weight: 900;
+            color: white;
+            margin: 0;
+        }
+
+        /* 標語樣式 */
+        #game-subtitle {
+            font-size: 20px;
+            font-weight: 700;
+            color: white;
+            margin: 5px 0 0;
+        }
+
+        /* 主要容器 */
         #game-container {
             position: relative;
             width: 100%;
             height: 100vh;
         }
 
+        /* 背景 */
         .parallax-bg {
             position: absolute;
             top: 0;
@@ -47,33 +64,26 @@
             z-index: 1;
         }
 
-        /* 背景音樂開關按鈕 */
+        /* 音樂開關按鈕（移至左上角） */
         #music-toggle {
             position: absolute;
-            top: 20px;
-            right: 20px;
-            padding: 10px 15px;
-            font-size: 16px;
-            background: #008CBA;
-            color: white;
+            top: 15px;
+            left: 15px;
+            font-size: 24px;
+            background: none;
             border: none;
-            border-radius: 8px;
+            color: white;
             cursor: pointer;
-            transition: 0.3s;
-            z-index: 10;
+            z-index: 11;
         }
 
-        #music-toggle:hover {
-            background: #0073a8;
-        }
-
-        /* 固定呱呱在右下角 */
+        /* 固定呱呱在右下角，並放大＆左移 */
         .main-character {
-            position: fixed;  /* 固定位置 */
-            right: 20px;  /* 距離右邊 20px */
-            bottom: 20px;  /* 距離底部 20px */
-            width: 200px;
-            z-index: 10;  /* 確保不會被其他元素遮擋 */
+            position: fixed;
+            right: 50px; /* 左移 */
+            bottom: 20px;
+            width: 250px; /* 放大 */
+            z-index: 10;
         }
 
         /* 對話框 */
@@ -90,47 +100,20 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             z-index: 2;
         }
-
-        .pixel-button {
-            display: inline-block;
-            padding: 12px 24px;
-            font-size: 18px;
-            background: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 15px;
-        }
-
-        .pixel-button:hover {
-            background: #45a049;
-        }
-
-        .screen {
-            display: none;
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-        }
-
-        .screen.active {
-            display: block;
-        }
     </style>
 </head>
 <body>
     <main id="game-container">
-        <!-- 標題文字放在背景上方 -->
-        <h1 id="game-title">別信！這是騙局：AI欺詐大作戰</h1>
+        <!-- 標題區塊（含半透明黑色背景） -->
+        <div id="title-container">
+            <h1 id="game-title">別信！這是騙局：AI欺詐大作戰</h1>
+            <h2 id="game-subtitle">113-2 屏大 AI 創作應用競賽暨成果展：AI x 生活</h2>
+        </div>
 
-        <!-- 音樂開關按鈕 -->
-        <button id="music-toggle">🔊 開啟音樂</button>
+        <!-- 音樂開關按鈕（左上角） -->
+        <button id="music-toggle">🔇</button>
 
-        <!-- 標題畫面 -->
+        <!-- 背景 -->
         <header id="title-screen" class="screen active">
             <img src="campus_bg.png" alt="校園背景" class="parallax-bg">
             <div class="dialog-box">
@@ -143,7 +126,7 @@
             </div>
         </header>
 
-        <!-- 固定呱呱在右下角 -->
+        <!-- 固定呱呱在右下角（放大＆左移） -->
         <img src="呱呱.PNG" alt="主角呱呱" class="main-character">
         
         <div id="level-container" class="screen"></div>
@@ -154,84 +137,41 @@
 
     <script>
         class GameState {
-            static currentLevel = 1;
-            static score = 0;
             static isMusicPlaying = false;
 
             static init() {
-                this.setupEventListeners();
-            }
-
-            static setupEventListeners() {
-                document.getElementById('start-btn').addEventListener('click', () => {
-                    this.showIntroduction();
-                });
-
-                document.getElementById('music-toggle').addEventListener('click', () => {
+                const musicButton = document.getElementById('music-toggle');
+                musicButton.addEventListener('click', () => {
                     this.toggleMusic();
                 });
-            }
 
-            static async showIntroduction() {
-                const dialogs = [
-                    "聽說這間學校的校長是牛奶糖，不知道是不是真的呢？🍬",
-                    "最近學校裡出現了好多詐騙事件...",
-                    "我需要你的幫助來識破這些騙局！",
-                    "準備好了嗎？讓我們一起打擊詐騙吧！🦆"
-                ];
-
-                const dialogBox = document.querySelector('#dialog-text');
-                dialogBox.innerHTML = '';
-
-                for (const text of dialogs) {
-                    await this.typeText(dialogBox, text);
-                    await new Promise(r => setTimeout(r, 1500));
-                }
-
-                dialogBox.innerHTML += `<button class="pixel-button" id="start-game-btn">開始挑戰！</button>`;
-                document.getElementById('start-game-btn').addEventListener('click', () => {
-                    this.loadLevel(1);
-                });
-            }
-
-            static typeText(container, text) {
-                return new Promise(resolve => {
-                    let index = 0;
-                    const typing = setInterval(() => {
-                        container.innerHTML = `<p>${text.slice(0, index)}</p>`;
-                        if (index++ >= text.length) {
-                            clearInterval(typing);
-                            resolve();
-                        }
-                    }, 50);
-                });
-            }
-
-            static loadLevel(levelId) {
-                document.getElementById('title-screen').classList.remove('active');
-                document.getElementById('level-container').classList.add('active');
+                // 初始化音樂按鈕狀態
+                this.updateMusicButton();
             }
 
             static toggleMusic() {
                 const bgm = document.getElementById('bgm');
-                const musicButton = document.getElementById('music-toggle');
-
                 if (this.isMusicPlaying) {
                     bgm.pause();
-                    musicButton.innerHTML = "🔇 開啟音樂";
                 } else {
                     bgm.play().catch(console.error);
-                    musicButton.innerHTML = "🔊 關閉音樂";
                 }
-
                 this.isMusicPlaying = !this.isMusicPlaying;
+                this.updateMusicButton();
+            }
+
+            static updateMusicButton() {
+                const musicButton = document.getElementById('music-toggle');
+                musicButton.innerHTML = this.isMusicPlaying ? "🔊" : "🔇";
             }
         }
 
-        GameState.init();
+        // 確保網頁載入時初始化
+        document.addEventListener("DOMContentLoaded", () => GameState.init());
     </script>
 </body>
 </html>
+
 
 
         // 第一關：語音詐騙
