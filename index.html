@@ -1,6 +1,3 @@
-
-
-
 <!DOCTYPE html>
 <html lang="zh-Hant-TW">
 <head>
@@ -11,10 +8,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="preload" href="campus_bg.png" as="image">
-    <link rel="preload" href="呱呱.PNG" as="image">
-    <link rel="preload" href="bgm.mp3" as="audio">
-    <link rel="preload" href="click.mp3" as="audio">
     <style>
         /* 全域樣式 */
         body {
@@ -62,30 +55,9 @@
             width: 200px;
         }
 
-        .pixel-button {
+        .dialog-box {
             position: absolute;
             bottom: 20%;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 3;
-            padding: 10px 20px;
-            font-size: 18px;
-            font-family: 'Noto Sans TC', sans-serif;
-            color: #fff;
-            background-color: #ff6f61;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        .pixel-button:hover {
-            background-color: #ff3b2f;
-        }
-
-        .dialog-bubble {
-            position: absolute;
-            top: 20%;
             left: 50%;
             transform: translateX(-50%);
             background-color: #fff;
@@ -94,22 +66,17 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             z-index: 3;
             max-width: 400px;
+            text-align: center;
         }
 
-        .dialog-bubble p {
+        .dialog-box p {
             margin: 0;
             font-size: 16px;
             line-height: 1.5;
         }
 
-        .options {
-            margin-top: 20px;
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-        }
-
-        .options button {
+        .dialog-box button {
+            margin-top: 10px;
             padding: 10px 20px;
             font-size: 16px;
             font-family: 'Noto Sans TC', sans-serif;
@@ -121,52 +88,8 @@
             transition: background-color 0.3s ease;
         }
 
-        .options button:hover {
+        .dialog-box button:hover {
             background-color: #45a049;
-        }
-
-        .damage-effect {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            z-index: 4;
-        }
-
-        .damage-effect img {
-            width: 100px;
-        }
-
-        .damage-effect p {
-            font-size: 20px;
-            color: #ff3b2f;
-            margin-top: 10px;
-        }
-
-        .ending-screen {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            z-index: 4;
-        }
-
-        .ending-screen h2 {
-            font-size: 32px;
-            color: #ff6f61;
-        }
-
-        .ending-screen img {
-            width: 200px;
-            margin-top: 20px;
-        }
-
-        .ending-screen .ending-text {
-            font-size: 18px;
-            color: #333;
-            margin-top: 20px;
         }
     </style>
 </head>
@@ -186,10 +109,6 @@
     <!-- 音效 -->
     <audio id="bgm" src="bgm.mp3" loop></audio>
     <audio id="click-sfx" src="click.mp3"></audio>
-    <audio id="voice-scam-bgm" src="voice-scam-bgm.mp3" loop></audio>
-    <audio id="deepfake-bgm" src="deepfake-bgm.mp3" loop></audio>
-    <audio id="investment-bgm" src="investment-bgm.mp3" loop></audio>
-    <audio id="text-scam-bgm" src="text-scam-bgm.mp3" loop></audio>
 
     <!-- 核心邏輯與關卡程式 -->
     <script>
@@ -206,7 +125,7 @@
                 // 綁定開始按鈕
                 document.getElementById('start-btn').addEventListener('click', () => {
                     this.playSound('click-sfx');
-                    this.loadLevel(1);
+                    this.showIntroduction();
                 });
             }
 
@@ -228,6 +147,56 @@
                 const bgm = document.getElementById('bgm');
                 bgm.play().catch(error => {
                     console.error('背景音樂播放失敗:', error);
+                });
+            }
+
+            // 顯示自我介紹對話框
+            static showIntroduction() {
+                const container = document.getElementById('title-screen');
+                container.innerHTML = `
+                    <img src="campus_bg.png" alt="校園背景" class="parallax-bg">
+                    <img src="呱呱.PNG" alt="主角呱呱" class="main-character">
+                    <div class="dialog-box">
+                        <p>我叫呱呱，是今年剛進入屏東大學的大一新鴨！</p>
+                        <button id="next-btn">下一句</button>
+                    </div>
+                `;
+
+                // 綁定下一句按鈕
+                document.getElementById('next-btn').addEventListener('click', () => {
+                    this.playSound('click-sfx');
+                    this.showNextDialog();
+                });
+            }
+
+            // 顯示下一句對話
+            static showNextDialog() {
+                const dialogBox = document.querySelector('.dialog-box');
+                dialogBox.innerHTML = `
+                    <p>聽說這間學校的校長是牛奶糖，不知道是不是真的呢？🍬</p>
+                    <button id="next-btn-2">下一句</button>
+                `;
+
+                // 綁定下一句按鈕
+                document.getElementById('next-btn-2').addEventListener('click', () => {
+                    this.playSound('click-sfx');
+                    this.showFinalDialog();
+                });
+            }
+
+            // 顯示最終對話
+            static showFinalDialog() {
+                const dialogBox = document.querySelector('.dialog-box');
+                dialogBox.innerHTML = `
+                    <p>最近學校裡出現了很多詐騙事件，我需要你的幫助來識破這些騙局！</p>
+                    <p>準備好了嗎？讓我們一起打擊詐騙吧！🦆</p>
+                    <button id="start-level-btn">開始挑戰</button>
+                `;
+
+                // 綁定開始挑戰按鈕
+                document.getElementById('start-level-btn').addEventListener('click', () => {
+                    this.playSound('click-sfx');
+                    this.loadLevel(1);
                 });
             }
 
@@ -300,132 +269,6 @@
                 if (this.score >= 400) return '你簡直是鴨界福爾摩斯！所有陷阱都逃不過你的法眼！';
                 if (this.score >= 300) return '厲害厲害！校園防詐就靠你守護啦～';
                 return '哎呀～要多提高警覺才行啊！';
-            }
-        }
-
-        // 第一關 - VoiceScamLevel
-        class VoiceScamLevel {
-            static init() {
-                const container = document.getElementById('level-container');
-                container.innerHTML = `
-                    <div class="phone-scene">
-                        <img src="assets/images/characters/詐騙狐狸.png" class="villain">
-                        <div class="dialog-bubble">
-                            <p>📞「嘿！同學！我是阿牛教授啦～你的學分有點小問題，需要你『立刻』轉帳處理一下喔！不然可能會被當掉唷～😏」</p>
-                            <div class="options">
-                                <button data-choice="1">🤔 嗯...先驗證一下身份吧！</button>
-                                <button data-choice="2">🚨 這絕對是詐騙！掛斷並報警！</button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                document.querySelectorAll('[data-choice]').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        GameState.playSound('click-sfx');
-                        const choice = e.target.dataset.choice;
-                        this.handleChoice(choice);
-                    });
-                });
-
-                // 播放語音詐騙關卡 BGM
-                const voiceScamBGM = document.getElementById('voice-scam-bgm');
-                voiceScamBGM.play();
-            }
-
-            static handleChoice(choice) {
-                if(choice === '2') {
-                    GameState.score += 100;
-                    GameState.loadLevel(2);
-                    alert("🎉 太棒了！你成功識破了詐騙！分數 +100！");
-                } else {
-                    this.showDamageEffect();
-                }
-            }
-
-            static showDamageEffect() {
-                const container = document.getElementById('level-container');
-                container.innerHTML = `
-                    <div class="damage-effect">
-                        <img src="assets/images/ui/money_loss.png">
-                        <p>💸 哎呀！你被騙走了新台幣 30,000 元！下次要更小心喔～</p>
-                    </div>
-                `;
-                setTimeout(() => {
-                    alert("😅 沒關係！再試一次吧！");
-                    GameState.loadLevel(1);
-                }, 2000);
-            }
-        }
-
-        // 第二關 - DeepfakeLevel
-        class DeepfakeLevel {
-            static init() {
-                const container = document.getElementById('level-container');
-                container.innerHTML = `
-                    <div class="deepfake-game">
-                        <p>點擊假影片來識別偽造影片！</p>
-                    </div>
-                `;
-                GameState.playSound('click-sfx');
-                setTimeout(() => GameState.loadLevel(3), 2000); // Example game progression
-
-                // 播放 Deepfake 關卡 BGM
-                const deepfakeBGM = document.getElementById('deepfake-bgm');
-                deepfakeBGM.play();
-            }
-        }
-
-        // 第三關 - InvestmentScamLevel
-        class InvestmentScamLevel {
-            static init() {
-                const container = document.getElementById('level-container');
-                container.innerHTML = `
-                    <div class="investment-ui">
-                        <h2>💼 高報酬投資平台分析</h2>
-                        <div class="red-flags">
-                            <div class="flag" data-type="return-rate">
-                                <img src="assets/images/ui/高報酬率.png">
-                                <p>宣稱月報酬率 300%</p>
-                            </div>
-                            <div class="flag" data-type="fake-review">
-                                <img src="assets/images/ui/假評價.png">
-                                <p>假用戶評價</p>
-                            </div>
-                        </div>
-                        <button class="report-btn">🚩 檢舉此平台</button>
-                    </div>
-                `;
-
-                // 播放投資詐騙關卡 BGM
-                const investmentBGM = document.getElementById('investment-bgm');
-                investmentBGM.play();
-            }
-        }
-
-        // 第四關 - TextScamLevel
-        class TextScamLevel {
-            static init() {
-                const container = document.getElementById('level-container');
-                container.innerHTML = `
-                    <div class="browser-simulator">
-                        <div class="url-bar">https://www.pntsu.edu.tw</div>
-                        <div class="email-list">
-                            <div class="email" data-type="phishing">
-                                <img src="assets/images/ui/釣魚郵件.png">
-                                <p>[緊急] 您的密碼已外洩！立即重置</p>
-                            </div>
-                            <div class="email" data-type="safe">
-                                <img src="assets/images/ui/安全郵件.png">
-                                <p>📧 系統通知：密碼已成功更新！</p>
-                            </div>
-                        </div>
-                        <button class="choose-btn">📩 開啟郵件</button>
-                    </div>
-                `;
-
-                // 播放文字詐騙關卡 BGM
-                const textScamBGM = document.getElementById('text-scam-bgm');
-                textScamBGM.play();
             }
         }
 
