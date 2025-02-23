@@ -10,16 +10,43 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
     <!-- 預載入關鍵資源 -->
-    <link rel="preload" href="ampus_bg.png" as="image">
+    <link rel="preload" href="教室.webp" as="image">
     <link rel="preload" href="呱.PNG.png" as="image">
-    <link rel="preload" href="bgm.mp3" as="audio">
+    <link rel="preload" href="assets/sounds/bgm.mp3" as="audio">
     <link rel="preload" href="assets/sounds/click.mp3" as="audio">
+
+    <style>
+        /* 使背景圖片位於下層 */
+        #title-screen {
+            position: relative;
+        }
+
+        .parallax-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1; /* 背景圖片的層級 */
+        }
+
+        .main-character {
+            position: absolute;
+            z-index: 2; /* 角色圖層級 */
+        }
+
+        #start-btn {
+            position: relative;
+            z-index: 3; /* 開始按鈕的層級 */
+            margin-top: 10px; /* 確保按鈕不會被遮蓋 */
+        }
+    </style>
 </head>
 <body>
     <main id="game-container">
         <!-- 標題畫面 -->
         <header id="title-screen" class="screen active">
-            <img src="ampus_bg.png" alt="校園背景" class="parallax-bg">
+            <img src="教室.webp" alt="校園背景" class="parallax-bg">
             <img src="呱.PNG" alt="主角呱呱" class="main-character">
             <button id="start-btn" class="pixel-button" aria-label="開始冒險">開始冒險</button>
         </header>
@@ -29,7 +56,7 @@
     </main>
 
     <!-- 音效 -->
-    <audio id="bgm" src="bgm.mp3" loop></audio>
+    <audio id="bgm" src="assets/sounds/bgm.mp3" loop></audio>
     <audio id="click-sfx" src="assets/sounds/click.mp3"></audio>
 
     <!-- 核心邏輯與關卡程式 -->
@@ -38,7 +65,16 @@
     <script src="deepfake.js" defer></script>
     <script src="investment.js" defer></script>
     <script src="text-scam.js" defer></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('start-btn').addEventListener('click', () => {
+                console.log('開始按鈕被點擊！');
+                GameState.playSound('click-sfx');
+                GameState.loadLevel(1);
+            });
+        });
+    </script>
 </body>
 </html>
-
 
