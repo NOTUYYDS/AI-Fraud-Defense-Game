@@ -9,19 +9,24 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+    <!-- 預載入關鍵資源 -->
+    <link rel="preload" href="assets/images/backgrounds/campus_bg.png" as="image">
+    <link rel="preload" href="assets/images/characters/呱呱_正常.png" as="image">
+    <link rel="preload" href="assets/sounds/bgm.mp3" as="audio">
+    <link rel="preload" href="assets/sounds/click.mp3" as="audio">
 </head>
 <body>
-    <div id="game-container">
+    <main id="game-container">
         <!-- 標題畫面 -->
-        <div id="title-screen" class="screen active">
+        <header id="title-screen" class="screen active">
             <img src="assets/images/backgrounds/campus_bg.png" alt="校園背景" class="parallax-bg">
             <img src="assets/images/characters/呱呱_正常.png" alt="主角呱呱" class="main-character">
-            <button id="start-btn" class="pixel-button">開始冒險</button>
-        </div>
+            <button id="start-btn" class="pixel-button" aria-label="開始冒險">開始冒險</button>
+        </header>
         
         <!-- 關卡容器 -->
         <div id="level-container" class="screen"></div>
-    </div>
+    </main>
 
     <!-- 音效 -->
     <audio id="bgm" src="assets/sounds/bgm.mp3" loop></audio>
