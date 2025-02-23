@@ -1,59 +1,55 @@
-
-/* 角色定位調整 */
+/* 角色定位 */
 .main-character {
     position: absolute;
-    right: 50px; /* 從右側邊緣向內移動 */
-    bottom: 120px;  /* 原始240px調整到更接近對話框 */
-    width: 220px;   /* 稍微放大角色 */
-    z-index: 3;
-    transform: translateY(0);
-    transition: all 0.3s ease; /* 添加過渡效果 */
+    right: 30px; /* 距離右側邊緣 */
+    bottom: calc(100% - 40px); /* 關鍵！根據對話框高度計算 */
+    width: 200px;
+    z-index: 4; /* 高於對話框 */
+    pointer-events: none; /* 避免點擊穿透 */
+    transform: translateY(20%) scaleX(-1); /* 微調位置+鏡像翻轉 */
+    filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.2));
 }
 
-/* 對話框系統調整 */
+/* 對話框系統 */
 .dialog-box {
-    width: 90%; /* 加寬對話框 */
-    max-width: 800px; /* 最大寬度增加 */
-    min-height: 180px; /* 增加最小高度 */
-    bottom: 30px; /* 稍微上移 */
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 85%;
+    max-width: 720px;
+    min-height: 160px; /* 固定最小高度 */
+    background: white;
+    border-radius: 15px 15px 0 15px; /* 右側圓角較小 */
+    padding: 25px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    z-index: 3;
 }
 
+/* 對話內容區域 */
 .dialog-content {
-    padding-right: 160px; /* 根據角色大小調整留白 */
-    min-height: 160px; /* 增加內容區域高度 */
+    position: relative;
+    padding-right: 180px; /* 預留角色空間 */
+    min-height: 140px;
     display: flex;
     flex-direction: column;
-    justify-content: center; /* 文字垂直居中 */
+    justify-content: center;
 }
-
-/* 對話文字調整 */
-#dialog-text {
-    font-size: 1.1em;
-    line-height: 1.6;
-    margin: 10px 0;
-}
-
-/* 按鈕位置調整 */
-#dialog-text .pixel-button {
-    align-self: flex-start; /* 按鈕靠左對齊 */
-    margin-top: 20px;
-}
-
-/* 響應式調整 */
-@media (max-width: 768px) {
-    .main-character {
-        right: 20px;
-        width: 150px;
-        bottom: 100px;
-    }
-    
-    .dialog-box {
-        width: 95%;
-        bottom: 10px;
-    }
-    
-    .dialog-content {
-        padding-right: 120px;
-        min-height: 120px;
-    }
+@media (max-width: 600px) {
+  .main-character {
+    right: 10px;
+    width: 120px;
+    bottom: calc(100% - 30px);
+  }
+  
+  .dialog-box {
+    width: 92%;
+    min-height: 120px;
+    padding: 15px;
+  }
+  
+  .dialog-content {
+    padding-right: 100px;
+    min-height: 100px;
+  }
 }
