@@ -5,10 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>別信！這是騙局：AI欺詐大作戰</title>
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="preload" href="campus_bg.png" as="image">
+    <link rel="preload" href="呱呱.PNG" as="image">
+    <link rel="preload" href="bgm.mp3" as="audio">
+    <link rel="preload" href="click.mp3" as="audio">
     <style>
         /* 全域樣式 */
         body {
@@ -17,86 +21,99 @@
             margin: 0;
             padding: 0;
             overflow: hidden;
-            background-color: #f0f0f0;
-            text-align: center;
         }
 
-        /* 標題容器 */
-        /* 標題與標語的背景覆蓋（全寬） */
-        #title-container {
-            position: relative;
-            background: rgba(0, 0, 0, 0.6);
-            padding: 20px;
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            background: rgba(0, 0, 0, 0.6); /* 半透明黑色覆蓋 */
-            padding: 20px 0;
-            text-align: center;
-            color: white;
-            z-index: 10;
-        }
-
-        /* 標題樣式 */
-        #game-title {
-            font-size: 48px;
-            font-weight: 900;
-            color: white;
-            margin: 0;
-        }
-
-        /* 標語樣式 */
-        #game-subtitle {
-            font-size: 20px;
-            font-weight: 700;
-            color: white;
-            margin: 5px 0 0;
-        }
-
-        /* 主角色樣式 */
-        .main-character {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(1.2);
-            transition: all 0.3s ease;
-        /* 主要容器 */
         #game-container {
             position: relative;
             width: 100%;
             height: 100vh;
         }
 
+        /* 標題畫面樣式 */
+        #title-screen {
+            position: relative;
+            height: 100%;
+        }
+
+        .parallax-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            object-fit: cover;
+        }
+
+        /* 角色定位 */
+        .main-character {
+            position: absolute;
+            right: 20px;
+            bottom: 240px;  /* 根據對話框高度調整 */
+            width: 200px;
+            z-index: 3;
+            transform: translateY(0);
+        }
+
         /* 對話框系統 */
         .dialog-box {
-        /* 背景 */
-        .parallax-bg {
             position: absolute;
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
             width: 80%;
-            max-width: 800px;
-            background: rgba(255,255,255,0.95);
-            border-radius: 20px;
-            padding: 25px;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            max-width: 600px;
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 2;
         }
 
+        .dialog-content {
+            position: relative;
+            padding-right: 120px; /* 留出角色空間 */
+            min-height: 120px;
+        }
+
+        /* 按鈕樣式 */
         .pixel-button {
+            display: inline-block;
+            padding: 12px 24px;
+            font-size: 18px;
             background: #4CAF50;
             color: white;
-            padding: 12px 24px;
             border: none;
             border-radius: 8px;
-            font-size: 18px;
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: all 0.3s ease;
+            margin-top: 15px;
         }
 
         .pixel-button:hover {
+            background: #45a049;
             transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        /* 關卡容器 */
+        .screen {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        /* 遊戲結束畫面 */
+        .ending-screen {
+            text-align: center;
+            padding: 30px;
         }
     </style>
 </head>
