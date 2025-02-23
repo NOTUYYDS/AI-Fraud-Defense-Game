@@ -46,9 +46,12 @@
             static soundCache = new Map();
 
             static init() {
-                this.playBGM();
-                this.setupEventListeners();
                 this.showAntiScamReminder();
+                document.querySelector('.confirm-btn').addEventListener('click', () => {
+                    this.playBGM();
+                    this.setupEventListeners();
+                });
+                this.loadProgress();
             }
 
             static setupEventListeners() {
@@ -77,7 +80,7 @@
                 ];
 
                 const dialogBox = document.querySelector('#dialog-text');
-                dialogBox.innerHTML = ''; // 清空初始內容
+                dialogBox.innerHTML = '';
 
                 for (const text of dialogs) {
                     await this.typeText(dialogBox, text);
@@ -114,33 +117,44 @@
                     </div>
                 `;
                 document.body.innerHTML = reminder + document.body.innerHTML;
-                document.querySelector('.confirm-btn').addEventListener('click', () => {
-                    document.querySelector('.legal-notice').remove();
-                });
             }
 
             static loadLevel(level) {
+                this.clearLevelContainer();
                 switch(level) {
                     case 1:
-                        // 加載第一關
                         VoiceScamLevel.init();
                         break;
                     case 2:
-                        // 加載第二關
                         DeepfakeLevel.init();
                         break;
                     case 3:
-                        // 加載第三關
                         InvestmentScamLevel.init();
                         break;
                     case 4:
-                        // 加載第四關
                         TextScamLevel.init();
                         break;
                     default:
-                        alert('遊戲結束！');
-                        break;
+                        this.showEnding();
                 }
+                this.saveProgress();
+            }
+
+            static clearLevelContainer() {
+                const container = document.getElementById('level-container');
+                while (container.firstChild) {
+                    container.removeChild(container.firstChild);
+                }
+            }
+
+            static saveProgress() {
+                localStorage.setItem('gameScore', GameState.score);
+                localStorage.setItem('currentLevel', GameState.currentLevel);
+            }
+
+            static loadProgress() {
+                GameState.score = parseInt(localStorage.getItem('gameScore')) || 0;
+                GameState.currentLevel = parseInt(localStorage.getItem('currentLevel')) || 1;
             }
         }
 
@@ -149,9 +163,9 @@
                 const container = document.getElementById('level-container');
                 container.innerHTML = `
                     <h2>📞 第一關：語音詐騙</h2>
-                    <p>「同學！我是阿牛教授，請你立即轉帳，我保證不當掉你！」</p> 
+                    <p>「同學！我是阿牛教授，你的學分有問題，需立即轉帳！」</p>
                     <div class="options">
-                        <button onclick="VoiceScamLevel.handleChoice(1)">🤔 用錢換學分好像不錯</button> 
+                        <button onclick="VoiceScamLevel.handleChoice(1)">🤔 要求驗證身份</button>
                         <button onclick="VoiceScamLevel.handleChoice(2)">🚨 掛斷並報警</button>
                     </div>
                 `;
@@ -173,61 +187,8 @@
             }
         }
 
-        // 添加 DeepfakeLevel, InvestmentScamLevel 和 TextScamLevel 類別
-        class DeepfakeLevel {
-            static init() {
-                const container = document.getElementById('level-container');
-                container.innerHTML = `
-                    <div class="deepfake-game">
-                        <h2>🔍 識別 Deepfake 影片</h2>
-                        <p>請仔細觀察以下影片，點擊你認為是偽造的影片！</p>
-                        <div class="video-grid">
-                            <div class="video" data-type="fake">
-                                <video src="assets/videos/fake-video.mp4" loop autoplay muted></video>
-                                <p>影片 A</p>
-                            </div>
-                            <div class="video" data-type="real">
-                                <video src="assets/videos/real-video.mp4" loop autoplay muted></video>
-                                <p>影片 B</p>
-                            </div>
-                        </div>
-                        <div class="hint">
-                            <p>提示：注意人物的臉部表情和聲音是否同步！</p>
-                        </div>
-                    </div>
-                `;
-                container.querySelectorAll('.video').forEach(video => {
-                    video.addEventListener('click', () => {
-                        const isFake = video.dataset.type === 'fake';
-                        this.handleVideoClick(isFake);
-                    });
-                });
-            }
-
-            static handleVideoClick(isFake) {
-                if (isFake) {
-                    GameState.score += 100;
-                    alert("🎉 太棒了！你成功識破了 Deepfake 影片！分數 +100！");
-                    GameState.loadLevel(3);
-                } else {
-                    this.showDamageEffect();
-                }
-            }
-
-            static showDamageEffect() {
-                const container = document.getElementById('level-container');
-                container.innerHTML = `
-                    <div class="damage-effect">
-                        <img src="assets/images/ui/money_loss.png">
-                        <p>💸 哎呀！你被騙走了新台幣 50,000 元！下次要更小心喔～</p>
-                    </div>
-                `;
-                setTimeout(() => GameState.loadLevel(2), 2000);
-            }
-        }
-
-        class InvestmentScamLevel {
-            static init() {
-                const container = document.getElementById('level-container');
-                container.innerHTML = `
-                    <div class="investment-ui">
+        // 初始化遊戲
+        GameState.init();
+    </script>
+</body>
+</html>
