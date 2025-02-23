@@ -8,6 +8,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="preload" href="campus_bg.png" as="image">
+    <link rel="preload" href="呱呱.PNG" as="image">
+    <link rel="preload" href="bgm.mp3" as="audio">
+    <link rel="preload" href="click.mp3" as="audio">
     <style>
         /* 全域樣式 */
         body {
@@ -24,6 +28,74 @@
             height: 100vh;
         }
 
+        /* 標題畫面樣式 */
+        #title-screen {
+            position: relative;
+            height: 100%;
+        }
+
+        .parallax-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            object-fit: cover;
+        }
+
+        /* 角色定位 */
+        .main-character {
+            position: absolute;
+            right: 20px;
+            bottom: 240px;  /* 根據對話框高度調整 */
+            width: 200px;
+            z-index: 3;
+            transform: translateY(0);
+        }
+
+        /* 對話框系統 */
+        .dialog-box {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            max-width: 600px;
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 2;
+        }
+
+        .dialog-content {
+            position: relative;
+            padding-right: 120px; /* 留出角色空間 */
+            min-height: 120px;
+        }
+
+        /* 按鈕樣式 */
+        .pixel-button {
+            display: inline-block;
+            padding: 12px 24px;
+            font-size: 18px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 15px;
+        }
+
+        .pixel-button:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        /* 關卡容器 */
         .screen {
             display: none;
             position: absolute;
@@ -37,59 +109,10 @@
             display: block;
         }
 
-        .parallax-bg {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-        }
-
-        .main-character {
-            position: absolute;
-            bottom: 10%;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 2;
-            width: 200px;
-        }
-
-        .dialog-box {
-            position: absolute;
-            bottom: 20%;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            z-index: 3;
-            max-width: 400px;
+        /* 遊戲結束畫面 */
+        .ending-screen {
             text-align: center;
-        }
-
-        .dialog-box p {
-            margin: 0;
-            font-size: 16px;
-            line-height: 1.5;
-        }
-
-        .dialog-box button {
-            margin-top: 10px;
-            padding: 10px 20px;
-            font-size: 16px;
-            font-family: 'Noto Sans TC', sans-serif;
-            color: #fff;
-            background-color: #4caf50;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        .dialog-box button:hover {
-            background-color: #45a049;
+            padding: 30px;
         }
     </style>
 </head>
@@ -98,8 +121,15 @@
         <!-- 標題畫面 -->
         <header id="title-screen" class="screen active">
             <img src="campus_bg.png" alt="校園背景" class="parallax-bg">
-            <img src="呱呱.PNG" alt="主角呱呱" class="main-character">
-            <button id="start-btn" class="pixel-button" aria-label="開始冒險">開始冒險</button>
+            <div class="dialog-box">
+                <div class="dialog-content">
+                    <img src="呱呱.PNG" alt="主角呱呱" class="main-character">
+                    <div id="dialog-text">
+                        <p>我叫呱呱，是今年剛進入屏東大學的大一新鴨！</p>
+                        <button id="start-btn" class="pixel-button">開始冒險</button>
+                    </div>
+                </div>
+            </div>
         </header>
         
         <!-- 關卡容器 -->
@@ -110,169 +140,181 @@
     <audio id="bgm" src="bgm.mp3" loop></audio>
     <audio id="click-sfx" src="click.mp3"></audio>
 
-    <!-- 核心邏輯與關卡程式 -->
     <script>
-        // GameState class definition
+        // GameState 遊戲狀態管理
         class GameState {
             static currentLevel = 1;
             static score = 0;
-            static soundCache = {}; // 音效快取
+            static soundCache = new Map();
 
             static init() {
-                // 初始化背景音樂
                 this.playBGM();
+                this.setupEventListeners();
+            }
 
-                // 綁定開始按鈕
-                document.getElementById('start-btn').addEventListener('click', () => {
-                    this.playSound('click-sfx');
-                    this.showIntroduction();
+            static setupEventListeners() {
+                // 動態綁定按鈕事件
+                document.addEventListener('click', e => {
+                    if (e.target.matches('#start-btn')) {
+                        this.playSound('click-sfx');
+                        this.showIntroduction();
+                    }
                 });
             }
 
-            // 播放音效
-            static playSound(soundId) {
-                if (!this.soundCache[soundId]) {
-                    const sound = new Audio(`${soundId}.mp3`);
-                    this.soundCache[soundId] = sound;
+            static async showIntroduction() {
+                const dialogs = [
+                    "聽說這間學校的校長是牛奶糖，不知道是不是真的呢？🍬",
+                    "最近學校裡出現了好多詐騙事件...",
+                    "我需要你的幫助來識破這些騙局！",
+                    "準備好了嗎？讓我們一起打擊詐騙吧！🦆"
+                ];
+
+                const dialogBox = document.querySelector('#dialog-text');
+                dialogBox.innerHTML = ''; // 清空初始內容
+
+                // 逐步顯示對話
+                for (const text of dialogs) {
+                    await this.typeText(dialogBox, text);
+                    await new Promise(r => setTimeout(r, 1500));
                 }
-                const sound = this.soundCache[soundId];
-                sound.currentTime = 0;
-                sound.play().catch(error => {
-                    console.error(`音效 ${soundId} 播放失敗:`, error);
-                });
-            }
 
-            // 播放背景音樂
-            static playBGM() {
-                const bgm = document.getElementById('bgm');
-                bgm.play().catch(error => {
-                    console.error('背景音樂播放失敗:', error);
-                });
-            }
-
-            // 顯示自我介紹對話框
-            static showIntroduction() {
-                const container = document.getElementById('title-screen');
-                container.innerHTML = `
-                    <img src="campus_bg.png" alt="校園背景" class="parallax-bg">
-                    <img src="呱呱.PNG" alt="主角呱呱" class="main-character">
-                    <div class="dialog-box">
-                        <p>我叫呱呱，是今年剛進入屏東大學的大一新鴨！</p>
-                        <button id="next-btn">下一句</button>
-                    </div>
-                `;
-
-                // 綁定下一句按鈕
-                document.getElementById('next-btn').addEventListener('click', () => {
-                    this.playSound('click-sfx');
-                    this.showNextDialog();
-                });
-            }
-
-            // 顯示下一句對話
-            static showNextDialog() {
-                const dialogBox = document.querySelector('.dialog-box');
-                dialogBox.innerHTML = `
-                    <p>聽說這間學校的校長是牛奶糖，不知道是不是真的呢？🍬</p>
-                    <button id="next-btn-2">下一句</button>
-                `;
-
-                // 綁定下一句按鈕
-                document.getElementById('next-btn-2').addEventListener('click', () => {
-                    this.playSound('click-sfx');
-                    this.showFinalDialog();
-                });
-            }
-
-            // 顯示最終對話
-            static showFinalDialog() {
-                const dialogBox = document.querySelector('.dialog-box');
-                dialogBox.innerHTML = `
-                    <p>最近學校裡出現了很多詐騙事件，我需要你的幫助來識破這些騙局！</p>
-                    <p>準備好了嗎？讓我們一起打擊詐騙吧！🦆</p>
-                    <button id="start-level-btn">開始挑戰</button>
-                `;
-
-                // 綁定開始挑戰按鈕
-                document.getElementById('start-level-btn').addEventListener('click', () => {
-                    this.playSound('click-sfx');
+                // 顯示開始按鈕
+                dialogBox.innerHTML += `<button class="pixel-button" id="start-game-btn">開始挑戰！</button>`;
+                document.getElementById('start-game-btn').addEventListener('click', () => {
                     this.loadLevel(1);
                 });
             }
 
-            // 載入關卡
+            static typeText(container, text) {
+                return new Promise(resolve => {
+                    let index = 0;
+                    const typing = setInterval(() => {
+                        container.innerHTML = `<p>${text.slice(0, index)}</p>`;
+                        if (index++ >= text.length) {
+                            clearInterval(typing);
+                            resolve();
+                        }
+                    }, 50);
+                });
+            }
+
+            static playSound(soundId) {
+                if (!this.soundCache.has(soundId)) {
+                    this.soundCache.set(soundId, new Audio(`${soundId}.mp3`));
+                }
+                const sound = this.soundCache.get(soundId);
+                sound.currentTime = 0;
+                sound.play().catch(console.error);
+            }
+
+            static playBGM() {
+                const bgm = document.getElementById('bgm');
+                bgm.volume = 0.3;
+                bgm.play().catch(console.error);
+            }
+
             static loadLevel(levelId) {
                 this.currentLevel = levelId;
+                document.getElementById('title-screen').classList.remove('active');
                 this.clearLevelContainer();
 
-                // 隱藏標題畫面
-                document.getElementById('title-screen').classList.remove('active');
-
-                // 根據關卡 ID 載入對應關卡
-                switch (levelId) {
-                    case 1:
-                        VoiceScamLevel.init();
-                        break;
-                    case 2:
-                        DeepfakeLevel.init();
-                        break;
-                    case 3:
-                        InvestmentScamLevel.init();
-                        break;
-                    case 4:
-                        TextScamLevel.init();
-                        break;
-                    default:
-                        this.showEnding();
+                switch(levelId) {
+                    case 1: VoiceScamLevel.init(); break;
+                    case 2: DeepfakeLevel.init(); break;
+                    case 3: InvestmentScamLevel.init(); break;
+                    case 4: TextScamLevel.init(); break;
+                    default: this.showEnding();
                 }
 
-                // 顯示遊戲畫面
                 document.getElementById('level-container').classList.add('active');
             }
 
-            // 清除關卡容器
             static clearLevelContainer() {
                 const container = document.getElementById('level-container');
-                container.innerHTML = '';
+                while (container.firstChild) {
+                    container.removeChild(container.firstChild);
+                }
             }
 
-            // 顯示遊戲結束畫面
             static showEnding() {
-                const container = document.getElementById('level-container');
-                container.innerHTML = `
+                const endingHtml = `
                     <div class="ending-screen">
                         <h2>${this.getEndingTitle()}</h2>
-                        <img src="${this.getEndingImage()}" alt="遊戲結束角色" class="ending-character">
+                        <img src="${this.score >= 300 ? '呱呱_開心.png' : '呱呱_受傷.png'}" 
+                             alt="結局角色" 
+                             style="width:200px;margin:20px">
                         <div class="ending-text">
                             <p>${this.getEndingText()}</p>
-                            <p>你的分數：${this.score} 分</p>
+                            <p>最終分數：${this.score} 分</p>
                         </div>
                         <button onclick="location.reload()" class="pixel-button">再玩一次</button>
                     </div>
                 `;
+                document.getElementById('level-container').innerHTML = endingHtml;
             }
 
-            // 根據分數取得結局標題
             static getEndingTitle() {
-                if (this.score >= 400) return '🎉 防詐天才鴨';
-                if (this.score >= 300) return '🛡️ 安全守護者';
-                return '⚠️ 需要加強警戒';
+                return this.score >= 400 ? '🎉 防詐天才鴨' :
+                       this.score >= 300 ? '🛡️ 安全守護者' : '⚠️ 需要加強警戒';
             }
 
-            // 根據分數取得結局圖片
-            static getEndingImage() {
-                return this.score >= 300 ? 'assets/images/characters/呱呱_開心.png' : 'assets/images/characters/呱呱_受傷.png';
-            }
-
-            // 根據分數取得結局文字
             static getEndingText() {
-                if (this.score >= 400) return '你簡直是鴨界福爾摩斯！所有陷阱都逃不過你的法眼！';
-                if (this.score >= 300) return '厲害厲害！校園防詐就靠你守護啦～';
-                return '哎呀～要多提高警覺才行啊！';
+                return this.score >= 400 ? '你簡直是鴨界福爾摩斯！所有陷阱都逃不過你的法眼！' :
+                       this.score >= 300 ? '厲害厲害！校園防詐就靠你守護啦～' :
+                       '哎呀～要多提高警覺才行啊！';
             }
         }
 
-        // 啟動遊戲
+        // 第一關：語音詐騙
+        class VoiceScamLevel {
+            static init() {
+                const container = document.getElementById('level-container');
+                container.innerHTML = `
+                    <div class="phone-scene">
+                        <div class="dialog-bubble">
+                            <img src="詐騙狐狸.png" alt="詐騙者" 
+                                 style="width:120px;position:absolute;right:-50px;top:-50px">
+                            <p>📞「同學！我是阿牛教授，你的學分有問題，需立即轉帳！」</p>
+                            <div class="options">
+                                <button data-choice="1">🤔 要求驗證身份</button>
+                                <button data-choice="2">🚨 掛斷並報警</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                container.querySelectorAll('[data-choice]').forEach(btn => {
+                    btn.addEventListener('click', e => {
+                        GameState.playSound('click-sfx');
+                        this.handleChoice(e.target.dataset.choice);
+                    });
+                });
+            }
+
+            static handleChoice(choice) {
+                if (choice === '2') {
+                    GameState.score += 100;
+                    GameState.loadLevel(2);
+                } else {
+                    this.showDamageEffect();
+                }
+            }
+
+            static showDamageEffect() {
+                const container = document.getElementById('level-container');
+                container.innerHTML = `
+                    <div class="damage-effect">
+                        <img src="money_loss.png" alt="金錢損失" style="width:100px">
+                        <p>💸 損失新台幣 30,000 元！</p>
+                    </div>
+                `;
+                setTimeout(() => GameState.loadLevel(1), 2000);
+            }
+        }
+
+      
+        // 初始化遊戲
         GameState.init();
     </script>
 </body>
