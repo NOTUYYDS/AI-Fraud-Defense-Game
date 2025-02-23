@@ -1,1 +1,59 @@
 
+/* 角色定位調整 */
+.main-character {
+    position: absolute;
+    right: 50px; /* 從右側邊緣向內移動 */
+    bottom: 120px;  /* 原始240px調整到更接近對話框 */
+    width: 220px;   /* 稍微放大角色 */
+    z-index: 3;
+    transform: translateY(0);
+    transition: all 0.3s ease; /* 添加過渡效果 */
+}
+
+/* 對話框系統調整 */
+.dialog-box {
+    width: 90%; /* 加寬對話框 */
+    max-width: 800px; /* 最大寬度增加 */
+    min-height: 180px; /* 增加最小高度 */
+    bottom: 30px; /* 稍微上移 */
+}
+
+.dialog-content {
+    padding-right: 160px; /* 根據角色大小調整留白 */
+    min-height: 160px; /* 增加內容區域高度 */
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* 文字垂直居中 */
+}
+
+/* 對話文字調整 */
+#dialog-text {
+    font-size: 1.1em;
+    line-height: 1.6;
+    margin: 10px 0;
+}
+
+/* 按鈕位置調整 */
+#dialog-text .pixel-button {
+    align-self: flex-start; /* 按鈕靠左對齊 */
+    margin-top: 20px;
+}
+
+/* 響應式調整 */
+@media (max-width: 768px) {
+    .main-character {
+        right: 20px;
+        width: 150px;
+        bottom: 100px;
+    }
+    
+    .dialog-box {
+        width: 95%;
+        bottom: 10px;
+    }
+    
+    .dialog-content {
+        padding-right: 120px;
+        min-height: 120px;
+    }
+}
