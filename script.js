@@ -109,3 +109,4 @@ class GameState {
 
 // 初始化遊戲
 GameState.init();
+
