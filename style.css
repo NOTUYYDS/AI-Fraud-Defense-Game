@@ -55,3 +55,114 @@ body {
 .pixel-button:hover {
     background: #45a049;
 }
+/* 投資詐騙關卡 */
+.investment-ui {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    max-width: 600px;
+    margin: 20px auto;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.red-flags {
+    display: flex;
+    justify-content: space-around;
+    margin: 20px 0;
+}
+
+.flag {
+    padding: 10px;
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.flag:hover {
+    transform: scale(1.05);
+}
+
+.flag.exposed {
+    border-color: #ff4444;
+}
+
+.report-btn {
+    background: #ff4444;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background 0.3s;
+}
+
+.report-btn:hover {
+    background: #cc0000;
+}
+
+/* 文字詐騙關卡 */
+.browser-simulator {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    max-width: 800px;
+    margin: 20px auto;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.email-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 20px 0;
+}
+
+.email {
+    padding: 10px;
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    cursor: grab;
+    transition: transform 0.2s;
+}
+
+.email:hover {
+    transform: scale(1.02);
+}
+
+.drop-zone {
+    display: flex;
+    justify-content: space-around;
+    margin: 20px 0;
+}
+
+.zone {
+    padding: 20px;
+    border: 2px dashed #ccc;
+    border-radius: 10px;
+    text-align: center;
+    width: 45%;
+}
+
+.zone.legit {
+    border-color: #4CAF50;
+}
+
+.zone.phishing {
+    border-color: #ff4444;
+}
+
+/* 警告訊息 */
+.warning-message {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #ff4444;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    z-index: 1000;
+}
+
