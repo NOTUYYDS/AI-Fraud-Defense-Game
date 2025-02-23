@@ -172,54 +172,102 @@
 </body>
 </html>
 
+class GameState {
+    static score = 0; // 初始化分數
+    static isMusicPlaying = false;
 
+    static init() {
+        // 綁定音樂按鈕
+        const musicButton = document.getElementById('music-toggle');
+        musicButton.addEventListener('click', () => {
+            this.toggleMusic();
+        });
 
-        // 第一關：語音詐騙
-        class VoiceScamLevel {
-            static init() {
-                const container = document.getElementById('level-container');
-                container.innerHTML = `
-                    <div class="phone-scene">
-                        <div class="dialog-bubble">
-                            <img src="詐騙狐狸.png" alt="詐騙者" 
-                                 style="width:120px;position:absolute;right:-50px;top:-50px">
-                            <p>📞「同學！我是阿牛教授，你的學分有問題，需立即轉帳！」</p>
-                            <div class="options">
-                                <button data-choice="1">🤔 要求驗證身份</button>
-                                <button data-choice="2">🚨 掛斷並報警</button>
-                            </div>
-                        </div>
-                    </div>
-                `;
+        this.updateMusicButton();
+    }
 
-                container.querySelectorAll('[data-choice]').forEach(btn => {
-                    btn.addEventListener('click', e => {
-                        GameState.playSound('click-sfx');
-                        this.handleChoice(e.target.dataset.choice);
-                    });
-                });
-            }
-
-            static handleChoice(choice) {
-                if (choice === '2') {
-                    GameState.score += 100;
-                    GameState.loadLevel(2);
-                } else {
-                    this.showDamageEffect();
-                }
-            }
-
-            static showDamageEffect() {
-                const container = document.getElementById('level-container');
-                container.innerHTML = `
-                    <div class="damage-effect">
-                        <img src="money_loss.png" alt="金錢損失" style="width:100px">
-                        <p>💸 損失新台幣 30,000 元！</p>
-                    </div>
-                `;
-                setTimeout(() => GameState.loadLevel(1), 2000);
-            }
+    static toggleMusic() {
+        const bgm = document.getElementById('bgm');
+        if (this.isMusicPlaying) {
+            bgm.pause();
+        } else {
+            bgm.play().catch(console.error); // 避免音樂播放被阻擋
         }
+        this.isMusicPlaying = !this.isMusicPlaying;
+        this.updateMusicButton();
+    }
+
+    static updateMusicButton() {
+        const musicButton = document.getElementById('music-toggle');
+        musicButton.innerHTML = this.isMusicPlaying ? "🔊" : "🔇";
+    }
+
+    static playSound(soundId) {
+        const sound = document.getElementById(soundId);
+        if (sound) {
+            sound.currentTime = 0;
+            sound.play().catch(console.error); // 捕捉播放錯誤
+        }
+    }
+
+    static loadLevel(level) {
+        switch (level) {
+            case 1: VoiceScamLevel.init(); break;
+            case 2: DeepfakeLevel.init(); break;
+            case 3: InvestmentScamLevel.init(); break;
+            case 4: TextScamLevel.init(); break;
+            default: alert("🎉 恭喜破關！遊戲結束！"); 
+        }
+    }
+}
+
+/* ============ 第一關：語音詐騙 ============ */
+class VoiceScamLevel {
+    static init() {
+        const container = document.getElementById('level-container');
+        container.innerHTML = `
+            <div class="phone-scene">
+                <div class="dialog-bubble">
+                    <img src="詐騙狐狸.png" alt="詐騙者" style="width:120px;position:absolute;right:-50px;top:-50px">
+                    <p>📞「同學！我是阿牛教授，你的學分有問題，需立即轉帳！」</p>
+                    <div class="options">
+                        <button data-choice="1">🤔 要求驗證身份</button>
+                        <button data-choice="2">🚨 掛斷並報警</button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        container.querySelectorAll('[data-choice]').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                GameState.playSound('click-sfx');
+                VoiceScamLevel.handleChoice(e.target.dataset.choice);
+            });
+        });
+    }
+
+    static handleChoice(choice) {
+        if (choice === '2') {
+            GameState.score += 100;
+            GameState.loadLevel(2);
+        } else {
+            VoiceScamLevel.showDamageEffect();
+        }
+    }
+
+    static showDamageEffect() {
+        const container = document.getElementById('level-container');
+        container.innerHTML = `
+            <div class="damage-effect">
+                <img src="money_loss.png" alt="金錢損失" style="width:100px">
+                <p>💸 損失新台幣 30,000 元！</p>
+            </div>
+        `;
+        setTimeout(() => GameState.loadLevel(1), 2000);
+    }
+}
+
+/* ============ 第二關：Deepfake 影片辨識 ============ */
 class DeepfakeLevel {
     static init() {
         const container = document.getElementById('level-container');
@@ -243,14 +291,12 @@ class DeepfakeLevel {
             </div>
         `;
 
-        // 播放關卡 BGM
         GameState.playSound('deepfake-bgm');
 
-        // 綁定影片點擊事件
         container.querySelectorAll('.video').forEach(video => {
             video.addEventListener('click', () => {
                 const isFake = video.dataset.type === 'fake';
-                this.handleVideoClick(isFake);
+                DeepfakeLevel.handleVideoClick(isFake);
             });
         });
     }
@@ -261,7 +307,7 @@ class DeepfakeLevel {
             alert("🎉 太棒了！你成功識破了 Deepfake 影片！分數 +100！");
             GameState.loadLevel(3);
         } else {
-            this.showDamageEffect();
+            DeepfakeLevel.showDamageEffect();
         }
     }
 
@@ -279,131 +325,6 @@ class DeepfakeLevel {
         }, 2000);
     }
 }
-      class InvestmentScamLevel {
-    static init() {
-        const container = document.getElementById('level-container');
-        container.innerHTML = `
-            <div class="investment-ui">
-                <h2>💼 高報酬投資平台分析</h2>
-                <p>請仔細檢查以下投資平台，找出可疑的紅旗！</p>
-                <div class="red-flags">
-                    <div class="flag" data-type="return-rate">
-                        <img src="assets/images/ui/高報酬率.png">
-                        <p>宣稱月報酬率 300%</p>
-                        <button class="info-btn">ℹ️ 查看詳情</button>
-                    </div>
-                    <div class="flag" data-type="fake-review">
-                        <img src="assets/images/ui/假評價.png">
-                        <p>假用戶評價</p>
-                        <button class="info-btn">ℹ️ 查看詳情</button>
-                    </div>
-                    <div class="flag" data-type="hidden-fees">
-                        <img src="assets/images/ui/隱藏費用.png">
-                        <p>隱藏費用</p>
-                        <button class="info-btn">ℹ️ 查看詳情</button>
-                    </div>
-                </div>
-                <button class="report-btn">🚩 檢舉此平台</button>
-            </div>
-        `;
 
-        // 播放關卡 BGM
-        GameState.playSound('investment-bgm');
-
-        // 綁定查看詳情按鈕
-        container.querySelectorAll('.info-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const flagType = e.target.closest('.flag').dataset.type;
-                this.showFlagInfo(flagType);
-            });
-        });
-
-        // 綁定檢舉按鈕
-        container.querySelector('.report-btn').addEventListener('click', () => {
-            this.handleReport();
-        });
-    }
-
-    static showFlagInfo(flagType) {
-        const info = {
-            'return-rate': '過高的報酬率通常是詐騙的紅旗！',
-            'fake-review': '這些評價可能是假的，請小心！',
-            'hidden-fees': '隱藏費用會讓你損失更多錢！'
-        };
-        alert(`⚠️ ${info[flagType]}`);
-    }
-
-    static handleReport() {
-        GameState.score += 100;
-        alert("🎉 太棒了！你成功檢舉了詐騙平台！分數 +100！");
-        GameState.loadLevel(4);
-    }
-}
-        class TextScamLevel {
-    static init() {
-        const container = document.getElementById('level-container');
-        container.innerHTML = `
-            <div class="browser-simulator">
-                <h2>📧 識別釣魚郵件</h2>
-                <p>請仔細檢查以下郵件，找出可疑的釣魚郵件！</p>
-                <div class="email-list">
-                    <div class="email" data-type="phishing">
-                        <img src="assets/images/ui/釣魚郵件.png">
-                        <p>[緊急] 您的密碼已外洩！立即重置</p>
-                        <button class="open-btn">📩 開啟郵件</button>
-                    </div>
-                    <div class="email" data-type="safe">
-                        <img src="assets/images/ui/安全郵件.png">
-                        <p>📧 系統通知：密碼已成功更新！</p>
-                        <button class="open-btn">📩 開啟郵件</button>
-                    </div>
-                    <div class="email" data-type="phishing">
-                        <img src="assets/images/ui/釣魚郵件.png">
-                        <p>[重要] 您的帳戶已被鎖定，請立即解鎖！</p>
-                        <button class="open-btn">📩 開啟郵件</button>
-                    </div>
-                </div>
-            </div>
-        `;
-
-        // 播放關卡 BGM
-        GameState.playSound('text-scam-bgm');
-
-        // 綁定開啟郵件按鈕
-        container.querySelectorAll('.open-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const emailType = e.target.closest('.email').dataset.type;
-                this.handleEmailClick(emailType);
-            });
-        });
-    }
-
-    static handleEmailClick(emailType) {
-        if (emailType === 'phishing') {
-            GameState.score += 100;
-            alert("🎉 太棒了！你成功識破了釣魚郵件！分數 +100！");
-            GameState.loadLevel(5); // 進入下一關或結束遊戲
-        } else {
-            this.showDamageEffect();
-        }
-    }
-
-    static showDamageEffect() {
-        const container = document.getElementById('level-container');
-        container.innerHTML = `
-            <div class="damage-effect">
-                <img src="assets/images/ui/money_loss.png">
-                <p>💸 哎呀！你被騙走了新台幣 20,000 元！下次要更小心喔～</p>
-            </div>
-        `;
-        setTimeout(() => {
-            alert("😅 沒關係！再試一次吧！");
-            GameState.loadLevel(4);
-        }, 2000);
-    }
-}
-        // 初始化遊戲
-        GameState.init();
-    </script>
-</body>
-</html>
+/* ============ 初始化遊戲 ============ */
+document.addEventListener("DOMContentLoaded", () => GameState.init());
