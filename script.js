@@ -3,25 +3,24 @@ class GameState {
     static score = 0;
     static soundCache = {}; // 音效快取
 
-    static init() {
-        // 初始化背景音樂
-        this.playBGM();
+static init() {
+    // 初始化背景音樂
+    this.playBGM();
 
-        // 綁定開始按鈕
-        document.getElementById('start-btn').addEventListener('click', () => {
-            this.playSound('click-sfx');
-            this.loadLevel(1);
-        });
-    }
+    // 綁定開始按鈕
+    document.getElementById('start-btn').addEventListener('click', () => {
+        this.playSound('click-sfx');
+        this.loadLevel(1);
+    });
 
-    // 播放背景音樂
-    static playBGM() {
-        const bgm = document.getElementById('bgm');
-        bgm.volume = 0.3;
-        bgm.play().catch(error => {
-            console.error('背景音樂播放失敗:', error);
-        });
-    }
+    // 監聽「下一關」按鈕
+    document.addEventListener('click', function(event) {
+        if (event.target && event.target.id === 'next-btn') {
+            GameState.playSound('click-sfx');
+            GameState.loadLevel(GameState.currentLevel + 1);
+        }
+    });
+}
 
     // 播放音效
     static playSound(soundId) {
