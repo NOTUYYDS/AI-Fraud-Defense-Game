@@ -1,16 +1,13 @@
+<!DOCTYPE html>
 <html lang="zh-Hant-TW">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>別信！這是騙局：AI欺詐大作戰</title>
-    <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="preload" href="campus_bg.png" as="image">
-    <link rel="preload" href="呱呱.PNG" as="image">
-    <link rel="preload" href="bgm.mp3" as="audio">
-    <link rel="preload" href="click.mp3" as="audio">
+    
     <style>
         /* 全域樣式 */
         body {
@@ -19,6 +16,16 @@
             margin: 0;
             padding: 0;
             overflow: hidden;
+        }
+
+        /* 標題樣式 */
+        #game-title {
+            font-size: 42px; /* 增大字體 */
+            font-weight: bold;
+            text-align: center; /* 置中 */
+            color: #ff4500; /* 醒目的橘色 */
+            margin: 20px 0;
+            text-shadow: 3px 3px 5px rgba(0, 0, 0, 0.3);
         }
 
         #game-container {
@@ -116,6 +123,8 @@
     </style>
 </head>
 <body>
+    <h1 id="game-title">別信！這是騙局：AI欺詐大作戰</h1>
+    
     <main id="game-container">
         <!-- 標題畫面 -->
         <header id="title-screen" class="screen active">
@@ -140,24 +149,18 @@
     <audio id="click-sfx" src="click.mp3"></audio>
 
     <script>
-        // GameState 遊戲狀態管理
+        // 遊戲狀態管理
         class GameState {
             static currentLevel = 1;
             static score = 0;
-            static soundCache = new Map();
 
             static init() {
-                this.playBGM();
                 this.setupEventListeners();
             }
 
             static setupEventListeners() {
-                // 動態綁定按鈕事件
-                document.addEventListener('click', e => {
-                    if (e.target.matches('#start-btn')) {
-                        this.playSound('click-sfx');
-                        this.showIntroduction();
-                    }
+                document.getElementById('start-btn').addEventListener('click', () => {
+                    this.showIntroduction();
                 });
             }
 
@@ -170,15 +173,13 @@
                 ];
 
                 const dialogBox = document.querySelector('#dialog-text');
-                dialogBox.innerHTML = ''; // 清空初始內容
+                dialogBox.innerHTML = '';
 
-                // 逐步顯示對話
                 for (const text of dialogs) {
                     await this.typeText(dialogBox, text);
                     await new Promise(r => setTimeout(r, 1500));
                 }
 
-                // 顯示開始按鈕
                 dialogBox.innerHTML += `<button class="pixel-button" id="start-game-btn">開始挑戰！</button>`;
                 document.getElementById('start-game-btn').addEventListener('click', () => {
                     this.loadLevel(1);
@@ -198,73 +199,16 @@
                 });
             }
 
-            static playSound(soundId) {
-                if (!this.soundCache.has(soundId)) {
-                    this.soundCache.set(soundId, new Audio(`${soundId}.mp3`));
-                }
-                const sound = this.soundCache.get(soundId);
-                sound.currentTime = 0;
-                sound.play().catch(console.error);
-            }
-
-            static playBGM() {
-                const bgm = document.getElementById('bgm');
-                bgm.volume = 0.3;
-                bgm.play().catch(console.error);
-            }
-
             static loadLevel(levelId) {
-                this.currentLevel = levelId;
                 document.getElementById('title-screen').classList.remove('active');
-                this.clearLevelContainer();
-
-                switch(levelId) {
-                    case 1: VoiceScamLevel.init(); break;
-                    case 2: DeepfakeLevel.init(); break;
-                    case 3: InvestmentScamLevel.init(); break;
-                    case 4: TextScamLevel.init(); break;
-                    default: this.showEnding();
-                }
-
-
                 document.getElementById('level-container').classList.add('active');
             }
-
-            static clearLevelContainer() {
-                const container = document.getElementById('level-container');
-                while (container.firstChild) {
-                    container.removeChild(container.firstChild);
-                }
-            }
-
-            static showEnding() {
-                const endingHtml = `
-                    <div class="ending-screen">
-                        <h2>${this.getEndingTitle()}</h2>
-                        <img src="${this.score >= 300 ? '呱呱_開心.png' : '呱呱_受傷.png'}" 
-                             alt="結局角色" 
-                             style="width:200px;margin:20px">
-                        <div class="ending-text">
-                            <p>${this.getEndingText()}</p>
-                            <p>最終分數：${this.score} 分</p>
-                        </div>
-                        <button onclick="location.reload()" class="pixel-button">再玩一次</button>
-                    </div>
-                `;
-                document.getElementById('level-container').innerHTML = endingHtml;
-            }
-
-            static getEndingTitle() {
-                return this.score >= 400 ? '🎉 防詐天才鴨' :
-                       this.score >= 300 ? '🛡️ 安全守護者' : '⚠️ 需要加強警戒';
-            }
-
-            static getEndingText() {
-                return this.score >= 400 ? '你簡直是鴨界福爾摩斯！所有陷阱都逃不過你的法眼！' :
-                       this.score >= 300 ? '厲害厲害！校園防詐就靠你守護啦～' :
-                       '哎呀～要多提高警覺才行啊！';
-            }
         }
+
+        GameState.init();
+    </script>
+</body>
+</html>
 
         // 第一關：語音詐騙
         class VoiceScamLevel {
