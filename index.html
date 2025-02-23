@@ -1,259 +1,124 @@
+這樣改進後，遊戲的開場會更有故事性，玩家也能更好地融入遊戲情境！🎮✨
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-Hant-TW">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>防詐騙大冒險</title>
+    <title>別信！這是騙局：AI欺詐大作戰</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
+    
     <style>
-        /* 样式定义 */
-<style>
-    /* 🌈 全局变量 */
-    :root {
-        --primary-color: #2A2A72;
-        --secondary-color: #009FFD;
-        --accent-color: #FF6B6B;
-        --text-light: #F8F9FA;
-        --glass-bg: rgba(255, 255, 255, 0.15);
-    }
-
-    /* 🎯 标题区增强 */
-    .header {
-        position: relative;
-        padding: 25px;
-        background: linear-gradient(135deg, var(--primary-color), #0F4C81);
-        color: var(--text-light);
-        font-size: 2.2rem;
-        text-align: center;
-        font-family: "jf open 粉圓", "Noto Sans TC", sans-serif;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        border-bottom: 3px solid var(--secondary-color);
-    }
-
-    .sub-header {
-        font-size: 1.1rem;
-        color: #C8D6E5;
-        margin-top: 8px;
-        letter-spacing: 1.5px;
-    }
-
-    /* 🐸 吉祥物动态效果 */
-    .frog {
-        position: fixed;
-        bottom: 30px;
-        right: 50px;
-        width: 160px;
-        filter: drop-shadow(0 8px 15px rgba(0, 0, 0, 0.2));
-        animation: float 3s ease-in-out infinite;
-        cursor: pointer;
-        transition: transform 0.3s;
-    }
-
-    @keyframes float {
-        0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(-20px); }
-    }
-
-    .frog:hover {
-        transform: rotate(-5deg) scale(1.05);
-    }
-
-    /* 🎮 游戏主容器 */
-    #game-container {
-        max-width: 1200px;
-        margin: 30px auto;
-        padding: 25px;
-        background: var(--glass-bg);
-        backdrop-filter: blur(10px);
-        border-radius: 15px;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-    }
-
-    /* 🕹️ 音量按钮美化 */
-    .music-button {
-        position: fixed;
-        top: 25px;
-        left: 25px;
-        width: 45px;
-        height: 45px;
-        background: var(--glass-bg);
-        border: none;
-        border-radius: 50%;
-        backdrop-filter: blur(5px);
-        cursor: pointer;
-        transition: all 0.3s;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    }
-
-    .music-button i {
-        color: var(--text-light);
-        font-size: 1.4rem;
-    }
-
-    .music-button:hover {
-        background: rgba(255, 255, 255, 0.25);
-        transform: rotate(180deg) scale(1.1);
-    }
-
-    /* 📞 游戏关卡容器 */
-    #level-container {
-        margin: 2rem auto;
-        padding: 2rem;
-        background: var(--glass-bg);
-        border-radius: 15px;
-        backdrop-filter: blur(8px);
-        border: 1px solid rgba(255, 255, 255, 0.15);
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-    }
-
-    /* 🎮 选项按钮升级 */
-    .options button {
-        background: linear-gradient(135deg, var(--secondary-color), #00C9FF);
-        color: var(--text-light);
-        padding: 15px 30px;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        margin: 15px;
-        font-size: 1.1rem;
-        transition: all 0.3s;
-        position: relative;
-        overflow: hidden;
-        box-shadow: 0 4px 15px rgba(0, 201, 255, 0.3);
-    }
-
-    .options button::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(
-            120deg,
-            transparent,
-            rgba(255, 255, 255, 0.3),
-            transparent
-        );
-        transition: 0.5s;
-    }
-
-    .options button:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 8px 25px rgba(0, 201, 255, 0.4);
-    }
-
-    .options button:hover::before {
-        left: 100%;
-    }
-
-    /* 🚨 诈骗警告动效 */
-    .damage-effect {
-        padding: 25px;
-        border-radius: 12px;
-        background: rgba(255, 107, 107, 0.15);
-        border: 2px solid var(--accent-color);
-        animation: pulse 1.5s infinite;
-        position: relative;
-    }
-
-    @keyframes pulse {
-        0% { box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.4); }
-        70% { box-shadow: 0 0 0 15px rgba(255, 107, 107, 0); }
-        100% { box-shadow: 0 0 0 0 rgba(255, 107, 107, 0); }
-    }
-
-    /* 📹 影片区交互优化 */
-    .video-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 25px;
-        margin: 2rem 0;
-    }
-
-    .video {
-        background: var(--glass-bg);
-        border-radius: 12px;
-        padding: 15px;
-        cursor: pointer;
-        transition: all 0.3s;
-        position: relative;
-        overflow: hidden;
-        border: 2px solid transparent;
-    }
-
-    .video::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.3);
-        opacity: 0;
-        transition: 0.3s;
-    }
-
-    .video:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-    }
-
-    .video:hover::after {
-        opacity: 1;
-    }
-
-    .video[data-type="fake"]:hover {
-        border-color: var(--accent-color);
-    }
-
-    .video[data-type="real"]:hover {
-        border-color: #00C9A7;
-    }
-
-    /* 📱 响应式设计 */
-    @media (max-width: 768px) {
-        .header {
-            font-size: 1.8rem;
-            padding: 15px;
+        /* 全域樣式 */
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
         }
 
-        .frog {
-            width: 120px;
-            right: 20px;
-            bottom: 15px;
+        /* 標題與標語的背景覆蓋（全寬） */
+        #title-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.6); /* 半透明黑色覆蓋 */
+            padding: 20px 0;
+            text-align: center;
+            z-index: 10;
         }
 
+        /* 標題樣式 */
+        #game-title {
+            font-size: 48px;
+            font-weight: 900;
+            color: white;
+            margin: 0;
+        }
+
+        /* 標語樣式 */
+        #game-subtitle {
+            font-size: 20px;
+            font-weight: 700;
+            color: white;
+            margin: 5px 0 0;
+        }
+
+        /* 主要容器 */
         #game-container {
-            margin: 15px;
-            padding: 15px;
+            position: relative;
+            width: 100%;
+            height: 100vh;
         }
 
-        .options button {
-            padding: 12px 25px;
-            font-size: 1rem;
-            margin: 10px;
+        /* 背景 */
+        .parallax-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 1;
         }
-    }
-</style>
 
+        /* 音樂開關按鈕（移至左上角） */
+        #music-toggle {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            font-size: 24px;
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            z-index: 11;
+        }
+
+        /* 固定呱呱在右下角，並放大＆左移 */
+        .main-character {
+            position: fixed;
+            right: 50px; /* 左移 */
+            bottom: 20px;
+            width: 250px; /* 放大 */
+            z-index: 10;
+        }
+
+        /* 對話框 */
+        .dialog-box {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            max-width: 600px;
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 2;
+        }
+    </style>
 </head>
 <body>
-    <!-- 🏫 标题 -->
-    <div class="header">
-        別信！這是騙局：AI欺詐大作戰
-        <div class="sub-header">113-2屏大AI創作應用競賽暨成果展：AI x 生活</div>
-    </div>
-
     <main id="game-container">
+        <!-- 標題區塊（含半透明黑色背景） -->
+        <div id="title-container">
+            <h1 id="game-title">別信！這是騙局：AI欺詐大作戰</h1>
+            <h2 id="game-subtitle">113-2 屏大 AI 創作應用競賽暨成果展：AI x 生活</h2>
+        </div>
+
+        <!-- 音樂開關按鈕（左上角） -->
+        <button id="music-toggle">🔇</button>
+
+        <!-- 背景 -->
         <header id="title-screen" class="screen active">
+            <img src="campus_bg.png" alt="校園背景" class="parallax-bg">
             <div class="dialog-box">
                 <div class="dialog-content">
-                    <img src="呱呱.PNG" alt="主角呱呱" class="main-character">
                     <div id="dialog-text">
                         <p>我叫呱呱，是今年剛進入屏東大學的大一新鴨！</p>
                         <button id="start-btn" class="pixel-button">開始冒險</button>
@@ -262,166 +127,205 @@
             </div>
         </header>
 
+        <!-- 固定呱呱在右下角（放大＆左移） -->
+        <img src="呱呱.PNG" alt="主角呱呱" class="main-character">
+        
         <div id="level-container" class="screen"></div>
     </main>
 
-    <!-- 🎵 背景音樂 -->
-    <audio id="bgm" loop>
-        <source src="bgm.mp3" type="audio/mpeg">
-    </audio>
-
-    <audio id="click-sfx" src="click.mp3"></audio>
+    <!-- 音效 -->
+    <audio id="bgm" src="bgm.mp3" loop></audio>
 
     <script>
         class GameState {
-            static currentLevel = 1;
-            static score = 0;
-            static soundCache = new Map();
+            static isMusicPlaying = false;
 
             static init() {
-                this.showAntiScamReminder();
-                document.querySelector('.confirm-btn').addEventListener('click', () => {
-                    this.playBGM();
-                    this.setupEventListeners();
+                const musicButton = document.getElementById('music-toggle');
+                musicButton.addEventListener('click', () => {
+                    this.toggleMusic();
                 });
-                this.loadProgress();
+
+                // 初始化音樂按鈕狀態
+                this.updateMusicButton();
             }
 
-            static setupEventListeners() {
-                document.addEventListener('click', e => {
-                    if (e.target.matches('#start-btn')) {
-                        this.playSound('click-sfx');
-                        this.showIntroduction();
-                    }
-                });
-            }
-
-            static playSound(id) {
-                const sound = document.getElementById(id);
-                if (sound && !this.soundCache.has(id)) {
-                    sound.play();
-                    this.soundCache.set(id, sound);
-                }
-            }
-
-            static async showIntroduction() {
-                const dialogs = [
-                    "聽說這間學校的校長是牛奶糖，不知道是不是真的呢？🍬",
-                    "最近學校裡出現了好多詐騙事件...",
-                    "我需要你的幫助來識破這些騙局！",
-                    "準備好了嗎？讓我們一起打擊詐騙吧！🦆"
-                ];
-
-                const dialogBox = document.querySelector('#dialog-text');
-                dialogBox.innerHTML = '';
-
-                for (const text of dialogs) {
-                    await this.typeText(dialogBox, text);
-                    await new Promise(r => setTimeout(r, 1500));
-                }
-
-                dialogBox.innerHTML += `<button class="pixel-button" id="start-game-btn">開始挑戰！</button>`;
-                document.getElementById('start-game-btn').addEventListener('click', () => {
-                    this.loadLevel(1);
-                });
-            }
-
-            static typeText(container, text) {
-                return new Promise(resolve => {
-                    let index = 0;
-                    const typing = setInterval(() => {
-                        container.innerHTML = `<p>${text.slice(0, index)}</p>`;
-                        if (index++ >= text.length) {
-                            clearInterval(typing);
-                            resolve();
-                        }
-                    }, 50);
-                });
-            }
-
-            static showAntiScamReminder() {
-                const reminder = `
-                    <div class="legal-notice">
-                        <img src="assets/images/165_banner.png">
-                        <p>遊戲中所有詐騙手法皆真實存在</p>
-                        <p>遇到可疑情況請立即撥打</p>
-                        <p class="hotline-number">反詐騙諮詢專線 165</p>
-                        <button class="confirm-btn">我瞭解了，開始遊戲</button>
-                    </div>
-                `;
-                document.body.innerHTML = reminder + document.body.innerHTML;
-            }
-
-            static loadLevel(level) {
-                this.clearLevelContainer();
-                switch(level) {
-                    case 1:
-                        VoiceScamLevel.init();
-                        break;
-                    case 2:
-                        DeepfakeLevel.init();
-                        break;
-                    case 3:
-                        InvestmentScamLevel.init();
-                        break;
-                    case 4:
-                        TextScamLevel.init();
-                        break;
-                    default:
-                        this.showEnding();
-                }
-                this.saveProgress();
-            }
-
-            static clearLevelContainer() {
-                const container = document.getElementById('level-container');
-                while (container.firstChild) {
-                    container.removeChild(container.firstChild);
-                }
-            }
-
-            static saveProgress() {
-                localStorage.setItem('gameScore', GameState.score);
-                localStorage.setItem('currentLevel', GameState.currentLevel);
-            }
-
-            static loadProgress() {
-                GameState.score = parseInt(localStorage.getItem('gameScore')) || 0;
-                GameState.currentLevel = parseInt(localStorage.getItem('currentLevel')) || 1;
-            }
-        }
-
-        class VoiceScamLevel {
-            static init() {
-                const container = document.getElementById('level-container');
-                container.innerHTML = `
-                    <h2>📞 第一關：語音詐騙</h2>
-                    <p>「同學！我是阿牛教授，你的學分有問題，需立即轉帳！」</p>
-                    <div class="options">
-                        <button onclick="VoiceScamLevel.handleChoice(1)">🤔 要求驗證身份</button>
-                        <button onclick="VoiceScamLevel.handleChoice(2)">🚨 掛斷並報警</button>
-                    </div>
-                `;
-            }
-
-            static handleChoice(choice) {
-                const container = document.getElementById('level-container');
-                if (choice === 2) {
-                    alert("🎉 太棒了！你成功識破詐騙電話！");
-                    container.innerHTML = "<h2>🎉 你成功了！</h2>";
+            static toggleMusic() {
+                const bgm = document.getElementById('bgm');
+                if (this.isMusicPlaying) {
+                    bgm.pause();
                 } else {
-                    container.innerHTML = `
-                        <div class="damage-effect">
-                            <p>💸 損失新台幣 30,000 元！</p>
-                        </div>
-                    `;
-                    setTimeout(() => location.reload(), 2000);
+                    bgm.play().catch(console.error);
                 }
+                this.isMusicPlaying = !this.isMusicPlaying;
+                this.updateMusicButton();
+            }
+
+            static updateMusicButton() {
+                const musicButton = document.getElementById('music-toggle');
+                musicButton.innerHTML = this.isMusicPlaying ? "🔊" : "🔇";
             }
         }
 
-        // 初始化遊戲
-        GameState.init();
+        // 確保網頁載入時初始化
+        document.addEventListener("DOMContentLoaded", () => GameState.init());
     </script>
 </body>
 </html>
+
+class GameState {
+    static score = 0; // 初始化分數
+    static isMusicPlaying = false;
+
+    static init() {
+        // 綁定音樂按鈕
+        const musicButton = document.getElementById('music-toggle');
+        musicButton.addEventListener('click', () => {
+            this.toggleMusic();
+        });
+
+        this.updateMusicButton();
+    }
+
+    static toggleMusic() {
+        const bgm = document.getElementById('bgm');
+        if (this.isMusicPlaying) {
+            bgm.pause();
+        } else {
+            bgm.play().catch(console.error); // 避免音樂播放被阻擋
+        }
+        this.isMusicPlaying = !this.isMusicPlaying;
+        this.updateMusicButton();
+    }
+
+    static updateMusicButton() {
+        const musicButton = document.getElementById('music-toggle');
+        musicButton.innerHTML = this.isMusicPlaying ? "🔊" : "🔇";
+    }
+
+    static playSound(soundId) {
+        const sound = document.getElementById(soundId);
+        if (sound) {
+            sound.currentTime = 0;
+            sound.play().catch(console.error); // 捕捉播放錯誤
+        }
+    }
+
+    static loadLevel(level) {
+        switch (level) {
+            case 1: VoiceScamLevel.init(); break;
+            case 2: DeepfakeLevel.init(); break;
+            case 3: InvestmentScamLevel.init(); break;
+            case 4: TextScamLevel.init(); break;
+            default: alert("🎉 恭喜破關！遊戲結束！"); 
+        }
+    }
+}
+
+/* ============ 第一關：語音詐騙 ============ */
+class VoiceScamLevel {
+    static init() {
+        const container = document.getElementById('level-container');
+        container.innerHTML = `
+            <div class="phone-scene">
+                <div class="dialog-bubble">
+                    <img src="詐騙狐狸.png" alt="詐騙者" style="width:120px;position:absolute;right:-50px;top:-50px">
+                    <p>📞「同學！我是阿牛教授，你的學分有問題，需立即轉帳！」</p>
+                    <div class="options">
+                        <button data-choice="1">🤔 要求驗證身份</button>
+                        <button data-choice="2">🚨 掛斷並報警</button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        container.querySelectorAll('[data-choice]').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                GameState.playSound('click-sfx');
+                VoiceScamLevel.handleChoice(e.target.dataset.choice);
+            });
+        });
+    }
+
+    static handleChoice(choice) {
+        if (choice === '2') {
+            GameState.score += 100;
+            GameState.loadLevel(2);
+        } else {
+            VoiceScamLevel.showDamageEffect();
+        }
+    }
+
+    static showDamageEffect() {
+        const container = document.getElementById('level-container');
+        container.innerHTML = `
+            <div class="damage-effect">
+                <img src="money_loss.png" alt="金錢損失" style="width:100px">
+                <p>💸 損失新台幣 30,000 元！</p>
+            </div>
+        `;
+        setTimeout(() => GameState.loadLevel(1), 2000);
+    }
+}
+
+/* ============ 第二關：Deepfake 影片辨識 ============ */
+class DeepfakeLevel {
+    static init() {
+        const container = document.getElementById('level-container');
+        container.innerHTML = `
+            <div class="deepfake-game">
+                <h2>🔍 識別 Deepfake 影片</h2>
+                <p>請仔細觀察以下影片，點擊你認為是偽造的影片！</p>
+                <div class="video-grid">
+                    <div class="video" data-type="fake">
+                        <video src="assets/videos/fake-video.mp4" loop></video>
+                        <p>影片 A</p>
+                    </div>
+                    <div class="video" data-type="real">
+                        <video src="assets/videos/real-video.mp4" loop></video>
+                        <p>影片 B</p>
+                    </div>
+                </div>
+                <div class="hint">
+                    <p>提示：注意人物的臉部表情和聲音是否同步！</p>
+                </div>
+            </div>
+        `;
+
+        GameState.playSound('deepfake-bgm');
+
+        container.querySelectorAll('.video').forEach(video => {
+            video.addEventListener('click', () => {
+                const isFake = video.dataset.type === 'fake';
+                DeepfakeLevel.handleVideoClick(isFake);
+            });
+        });
+    }
+
+    static handleVideoClick(isFake) {
+        if (isFake) {
+            GameState.score += 100;
+            alert("🎉 太棒了！你成功識破了 Deepfake 影片！分數 +100！");
+            GameState.loadLevel(3);
+        } else {
+            DeepfakeLevel.showDamageEffect();
+        }
+    }
+
+    static showDamageEffect() {
+        const container = document.getElementById('level-container');
+        container.innerHTML = `
+            <div class="damage-effect">
+                <img src="assets/images/ui/money_loss.png">
+                <p>💸 哎呀！你被騙走了新台幣 50,000 元！下次要更小心喔～</p>
+            </div>
+        `;
+        setTimeout(() => {
+            alert("😅 沒關係！再試一次吧！");
+            GameState.loadLevel(2);
+        }, 2000);
+    }
+}
+
+/* ============ 初始化遊戲 ============ */
+document.addEventListener("DOMContentLoaded", () => GameState.init());
