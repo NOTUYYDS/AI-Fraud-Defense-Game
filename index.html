@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>別信！這是騙局：AI欺詐大作戰</title>
     <style>
-        /* 🌆 背景設定 */
         body {
             margin: 0;
             padding: 0;
@@ -17,15 +16,14 @@
             overflow-x: hidden;
             font-size: 16px;
             line-height: 1.6;
-            overscroll-behavior: none; /* 防止手機過度滾動 */
+            overscroll-behavior: none;
         }
 
-        /* 🎯 標題區 */
         .header {
             padding: 20px;
             background: linear-gradient(135deg, rgba(0, 0, 0, 0.7), rgba(50, 50, 50, 0.5));
             color: #fff;
-            font-size: clamp(24px, 5vw, 32px); /* 自適應字體 */
+            font-size: clamp(24px, 5vw, 32px);
             font-weight: bold;
             text-align: center;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
@@ -38,9 +36,9 @@
             color: #f0f0f0;
             margin-top: 10px;
             text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+            transition: opacity 0.5s ease;
         }
 
-        /* 🕹️ 遊戲區 */
         #game-container {
             position: relative;
             width: 100%;
@@ -53,11 +51,10 @@
             box-sizing: border-box;
         }
 
-        /* 🐸 呱呱 */
         .frog {
-            position: relative; /* 改為相對定位，避免遮擋 */
-            width: clamp(150px, 40vw, 300px); /* 手機適配 */
-            margin-bottom: 20px; /* 與對話框保持距離 */
+            position: relative;
+            width: clamp(150px, 40vw, 300px);
+            margin-bottom: 20px;
             transition: transform 0.3s ease, filter 0.3s ease;
         }
 
@@ -66,7 +63,6 @@
             filter: brightness(1.2);
         }
 
-        /* 💬 對話框 */
         .dialog-box {
             position: relative;
             width: 90%;
@@ -78,10 +74,9 @@
             font-size: clamp(16px, 4vw, 18px);
             border: 2px solid #87ceeb;
             animation: popIn 0.5s ease-out;
-            margin-bottom: 20px; /* 確保與呱呱分開 */
+            margin-bottom: 20px;
         }
 
-        /* 🎮 按鈕 */
         .options button {
             background: linear-gradient(45deg, #007bff, #00b7ff);
             color: white;
@@ -94,7 +89,7 @@
             font-weight: bold;
             box-shadow: 0 3px 10px rgba(0, 123, 255, 0.4);
             transition: all 0.3s ease;
-            touch-action: manipulation; /* 優化觸控 */
+            touch-action: manipulation;
         }
 
         .options button:hover, .options button:active {
@@ -103,7 +98,6 @@
             box-shadow: 0 6px 15px rgba(0, 123, 255, 0.6);
         }
 
-        /* 🔊 音量按鈕 */
         .music-button {
             position: fixed;
             top: 15px;
@@ -118,7 +112,6 @@
             z-index: 10;
         }
 
-        /* 🚨 詐騙警告 */
         .damage-effect {
             background: rgba(255, 0, 0, 0.1);
             padding: 20px;
@@ -128,7 +121,6 @@
             font-weight: bold;
         }
 
-        /* 關卡容器 */
         .screen {
             display: none;
             width: 100%;
@@ -141,7 +133,6 @@
             justify-content: space-between;
         }
 
-        /* 動畫 */
         @keyframes fadeInDown {
             from { opacity: 0; transform: translateY(-20px); }
             to { opacity: 1; transform: translateY(0); }
@@ -152,7 +143,6 @@
             100% { transform: scale(1); opacity: 1; }
         }
 
-        /* 手機適配 */
         @media (max-width: 768px) {
             .dialog-box { margin-top: 20px; }
             .frog { margin-top: auto; }
@@ -163,26 +153,22 @@
 <body>
     <button id="music-toggle" class="music-button">🔊</button>
     <main id="game-container">
-        <!-- 標題畫面 -->
         <header id="title-screen" class="screen active">
             <div class="header">
                 別信！這是騙局：AI欺詐大作戰
-                <div class="sub-header">與呱呱一起識破詐騙</div>
+                <div class="sub-header" id="sub-title">與呱呱一起識破詐騙</div>
             </div>
             <div class="dialog-box">
                 <div id="dialog-text">
-                    <p>我叫呱呱，是今年剛進入屏東大學的大一新鴨！</p>
+                    <p>我叫呱呱，是屏東大學的大一新鴨！校園裡詐騙橫行，快來幫我吧！</p>
                     <button id="start-btn" class="pixel-button">開始冒險</button>
                 </div>
             </div>
             <img src="呱呱.PNG" alt="主角呱呱" class="frog">
         </header>
-        
-        <!-- 關卡容器 -->
         <div id="level-container" class="screen"></div>
     </main>
 
-    <!-- 音效 -->
     <audio id="bgm" src="bgm.mp3" loop></audio>
     <audio id="click-sfx" src="click.mp3"></audio>
 
@@ -196,31 +182,44 @@
             static init() {
                 this.setupEventListeners();
                 this.updateMusicButton();
+                this.animateSubTitle();
+            }
+
+            static animateSubTitle() {
+                const subTitle = document.getElementById('sub-title');
+                let isOriginal = true;
+                setInterval(() => {
+                    subTitle.style.opacity = 0;
+                    setTimeout(() => {
+                        subTitle.textContent = isOriginal ? '113-2 屏大 AI 創作應用競賽 AI x 生活' : '與呱呱一起識破詐騙';
+                        subTitle.style.opacity = 1;
+                        isOriginal = !isOriginal;
+                    }, 500);
+                }, 2000);
             }
 
             static setupEventListeners() {
                 const startBtn = document.getElementById('start-btn');
                 const musicToggle = document.getElementById('music-toggle');
                 
-                startBtn.addEventListener('click', () => {
-                    this.playSound('click-sfx');
-                    this.showIntroduction();
-                });
-                startBtn.addEventListener('touchstart', () => { // 手機觸控支援
-                    this.playSound('click-sfx');
-                    this.showIntroduction();
-                });
+                startBtn.addEventListener('click', () => this.startGame());
+                startBtn.addEventListener('touchstart', () => this.startGame());
 
                 musicToggle.addEventListener('click', () => this.toggleMusic());
                 musicToggle.addEventListener('touchstart', () => this.toggleMusic());
             }
 
+            static startGame() {
+                this.playSound('click-sfx');
+                this.showIntroduction();
+            }
+
             static async showIntroduction() {
                 const dialogs = [
-                    "聽說這間學校的校長是牛奶糖，不知道是不是真的呢？🍬",
-                    "最近學校裡出現了好多詐騙事件...",
-                    "我需要你的幫助來識破這些騙局！",
-                    "準備好了嗎？讓我們一起打擊詐騙吧！🦆"
+                    "呱！我是呱呱，剛來屏東大學就聽到詐騙的傳聞，真是嚇鴨一跳！",
+                    "聽說有人假冒教授，還有人用假影片騙錢，真的好可怕...",
+                    "我需要你的智慧，一起揪出這些壞蛋，保護校園！",
+                    "準備好了嗎？我們要出發打擊詐騙啦！🦆"
                 ];
 
                 const dialogBox = document.getElementById('dialog-text');
@@ -232,8 +231,9 @@
                 }
 
                 dialogBox.innerHTML = `<button class="pixel-button" id="start-game-btn">開始挑戰！</button>`;
-                document.getElementById('start-game-btn').addEventListener('click', () => this.loadLevel(1));
-                document.getElementById('start-game-btn').addEventListener('touchstart', () => this.loadLevel(1));
+                const startGameBtn = document.getElementById('start-game-btn');
+                startGameBtn.addEventListener('click', () => this.loadLevel(1));
+                startGameBtn.addEventListener('touchstart', () => this.loadLevel(1));
             }
 
             static typeText(container, text) {
@@ -283,7 +283,10 @@
 
                 switch(levelId) {
                     case 1: VoiceScamLevel.init(); break;
-                    case 2: this.showEnding(); break; // 簡化為兩關範例
+                    case 2: DeepfakeLevel.init(); break;
+                    case 3: InvestmentScamLevel.init(); break;
+                    case 4: TextScamLevel.init(); break;
+                    case 5: this.showEnding(); break;
                     default: this.showEnding();
                 }
 
@@ -302,9 +305,10 @@
                     <div class="header">遊戲結束</div>
                     <div class="dialog-box">
                         <h2>${this.getEndingTitle()}</h2>
-                        <img src="${this.score >= 100 ? '呱呱_開心.png' : '呱呱_受傷.png'}" alt="結局角色" style="width:200px;margin:20px">
+                        <img src="${this.score >= 400 ? '呱呱_開心.png' : '呱呱_受傷.png'}" alt="結局角色" style="width:200px;margin:20px">
                         <p>${this.getEndingText()}</p>
                         <p>最終分數：${this.score} 分</p>
+                        <p style="color: #ff4500; font-weight: bold;">如遇詐騙，請撥打 165 反詐騙專線求助！</p>
                         <button onclick="location.reload()" class="pixel-button">再玩一次</button>
                     </div>
                 `;
@@ -312,11 +316,14 @@
             }
 
             static getEndingTitle() {
-                return this.score >= 100 ? '🎉 防詐天才鴨' : '⚠️ 需要加強警戒';
+                return this.score >= 400 ? '🎉 防詐天才鴨' :
+                       this.score >= 300 ? '🛡️ 安全守護者' : '⚠️ 需要加強警戒';
             }
 
             static getEndingText() {
-                return this.score >= 100 ? '你簡直是鴨界福爾摩斯！' : '哎呀～要多提高警覺才行啊！';
+                return this.score >= 400 ? '你簡直是鴨界福爾摩斯！所有詐騙都逃不過你的眼睛！' :
+                       this.score >= 300 ? '不錯不錯！你已經是校園安全的守護鴨啦～' :
+                       '哎呀～看來我們還得多練習才能打敗詐騙集團！';
             }
         }
 
@@ -326,10 +333,11 @@
                 container.innerHTML = `
                     <div class="header">第一關：語音詐騙</div>
                     <div class="dialog-box">
-                        <p>📞「同學！我是阿牛教授，你的學分有問題，需立即轉帳！」</p>
+                        <p>📞「喂！同學，我是阿牛教授，你的學分有問題，馬上轉帳 5 萬給我，不然就留級！」</p>
+                        <p style="color: #666;">呱呱：這聲音聽起來怪怪的，是教授嗎？</p>
                         <div class="options">
-                            <button class="pixel-button" data-choice="1">🤔 要求驗證身份</button>
-                            <button class="pixel-button" data-choice="2">🚨 掛斷並報警</button>
+                            <button data-choice="1">🤔 要求驗證身份</button>
+                            <button data-choice="2">🚨 掛斷並報警</button>
                         </div>
                     </div>
                     <img src="詐騙狐狸.png" alt="詐騙者" style="width:120px;">
@@ -357,10 +365,144 @@
                     <div class="header">第一關：語音詐騙</div>
                     <div class="dialog-box damage-effect">
                         <img src="money_loss.png" alt="金錢損失" style="width:100px">
-                        <p>💸 損失新台幣 30,000 元！</p>
+                        <p>💸 損失新台幣 30,000 元！呱呱：怎麼會這樣...</p>
                     </div>
                 `;
                 setTimeout(() => GameState.loadLevel(1), 2000);
+            }
+        }
+
+        class DeepfakeLevel {
+            static init() {
+                const container = document.getElementById('level-container');
+                container.innerHTML = `
+                    <div class="header">第二關：Deepfake 影片</div>
+                    <div class="dialog-box">
+                        <p>呱呱：我收到一個校長的影片，說要捐款給他！但他的嘴好像怪怪的...</p>
+                        <p>請點擊你認為是假的影片！</p>
+                        <div class="options">
+                            <button data-type="fake">影片 A（怪嘴校長）</button>
+                            <button data-type="real">影片 B（正常校長）</button>
+                        </div>
+                        <p style="color: #666;">提示：注意嘴型與聲音是否同步！</p>
+                    </div>
+                    <img src="呱呱.PNG" alt="呱呱" class="frog">
+                `;
+
+                container.querySelectorAll('[data-type]').forEach(btn => {
+                    btn.addEventListener('click', e => this.handleVideoClick(e.target.dataset.type));
+                    btn.addEventListener('touchstart', e => this.handleVideoClick(e.target.dataset.type));
+                });
+            }
+
+            static handleVideoClick(type) {
+                GameState.playSound('click-sfx');
+                if (type === 'fake') {
+                    GameState.score += 100;
+                    GameState.loadLevel(3);
+                } else {
+                    this.showDamageEffect();
+                }
+            }
+
+            static showDamageEffect() {
+                const container = document.getElementById('level-container');
+                container.innerHTML = `
+                    <div class="header">第二關：Deepfake 影片</div>
+                    <div class="dialog-box damage-effect">
+                        <p>💸 哎呀！你捐了新台幣 50,000 元給假校長！呱呱：我的學費...</p>
+                    </div>
+                `;
+                setTimeout(() => GameState.loadLevel(2), 2000);
+            }
+        }
+
+        class InvestmentScamLevel {
+            static init() {
+                const container = document.getElementById('level-container');
+                container.innerHTML = `
+                    <div class="header">第三關：投資詐騙</div>
+                    <div class="dialog-box">
+                        <p>呱呱：有人說投資這個平台，一個月就能賺 300%！聽起來好棒...</p>
+                        <p>但我覺得有點不對勁，你幫我選出正確行動吧！</p>
+                        <div class="options">
+                            <button data-choice="1">💰 立刻投資</button>
+                            <button data-choice="2">🚩 檢舉平台</button>
+                        </div>
+                    </div>
+                    <img src="詐騙狐狸.png" alt="詐騙者" style="width:120px;">
+                `;
+
+                container.querySelectorAll('[data-choice]').forEach(btn => {
+                    btn.addEventListener('click', e => this.handleChoice(e.target.dataset.choice));
+                    btn.addEventListener('touchstart', e => this.handleChoice(e.target.dataset.choice));
+                });
+            }
+
+            static handleChoice(choice) {
+                GameState.playSound('click-sfx');
+                if (choice === '2') {
+                    GameState.score += 100;
+                    GameState.loadLevel(4);
+                } else {
+                    this.showDamageEffect();
+                }
+            }
+
+            static showDamageEffect() {
+                const container = document.getElementById('level-container');
+                container.innerHTML = `
+                    <div class="header">第三關：投資詐騙</div>
+                    <div class="dialog-box damage-effect">
+                        <p>💸 你投入了新台幣 40,000 元，全沒了！呱呱：怎麼會這樣...</p>
+                    </div>
+                `;
+                setTimeout(() => GameState.loadLevel(3), 2000);
+            }
+        }
+
+        class TextScamLevel {
+            static init() {
+                const container = document.getElementById('level-container');
+                container.innerHTML = `
+                    <div class="header">第四關：釣魚郵件</div>
+                    <div class="dialog-box">
+                        <p>呱呱：我收到一封郵件說帳戶被鎖定，要我點連結解鎖！</p>
+                        <p>你覺得該怎麼做？</p>
+                        <div class="options">
+                            <button data-choice="1">📧 點擊連結</button>
+                            <button data-choice="2">🚨 忽略並檢舉</button>
+                        </div>
+                        <p style="color: #666;">提示：檢查寄件人與語氣是否可疑！</p>
+                    </div>
+                    <img src="呱呱.PNG" alt="呱呱" class="frog">
+                `;
+
+                container.querySelectorAll('[data-choice]').forEach(btn => {
+                    btn.addEventListener('click', e => this.handleChoice(e.target.dataset.choice));
+                    btn.addEventListener('touchstart', e => this.handleChoice(e.target.dataset.choice));
+                });
+            }
+
+            static handleChoice(choice) {
+                GameState.playSound('click-sfx');
+                if (choice === '2') {
+                    GameState.score += 100;
+                    GameState.loadLevel(5);
+                } else {
+                    this.showDamageEffect();
+                }
+            }
+
+            static showDamageEffect() {
+                const container = document.getElementById('level-container');
+                container.innerHTML = `
+                    <div class="header">第四關：釣魚郵件</div>
+                    <div class="dialog-box damage-effect">
+                        <p>💸 你點了假連結，損失新台幣 20,000 元！呱呱：我的零用錢...</p>
+                    </div>
+                `;
+                setTimeout(() => GameState.loadLevel(4), 2000);
             }
         }
 
