@@ -77,7 +77,7 @@
             margin-bottom: 20px;
         }
 
-        .options button, .shoot-btn, .invest-btn, .drag-item {
+        .options button, .shoot-btn, .invest-btn, .drag-item, .pixel-button {
             background: linear-gradient(45deg, #007bff, #00b7ff);
             color: white;
             padding: 12px 25px;
@@ -90,12 +90,22 @@
             box-shadow: 0 3px 10px rgba(0, 123, 255, 0.4);
             transition: all 0.3s ease;
             touch-action: manipulation;
+            will-change: transform, box-shadow;
         }
 
-        .options button:hover, .options button:active, .shoot-btn:hover, .invest-btn:hover, .drag-item:hover {
+        .options button:hover, .options button:active,
+        .shoot-btn:hover, .shoot-btn:active,
+        .invest-btn:hover, .invest-btn:active,
+        .drag-item:hover, .drag-item:active,
+        .pixel-button:hover, .pixel-button:active {
             background: linear-gradient(45deg, #0056b3, #0091ea);
             transform: translateY(-3px) scale(1.05);
             box-shadow: 0 6px 15px rgba(0, 123, 255, 0.6);
+        }
+
+        .options button:focus, .shoot-btn:focus, .invest-btn:focus, .drag-item:focus, .pixel-button:focus {
+            outline: 2px solid #ffd700;
+            outline-offset: 2px;
         }
 
         .music-button {
@@ -165,6 +175,11 @@
             padding: 10px;
         }
 
+        .drag-item.dragging {
+            box-shadow: 0 0 10px rgba(0, 123, 255, 0.8);
+            z-index: 100;
+        }
+
         @keyframes fadeInDown {
             from { opacity: 0; transform: translateY(-20px); }
             to { opacity: 1; transform: translateY(0); }
@@ -183,7 +198,7 @@
 
         @media (max-width: 768px) {
             .dialog-box { margin-top: 20px; }
-            .frog { margin-top: auto; }
+            ERK .frog { margin-top: auto; }
             #game-container { padding: 10px; }
         }
     </style>
@@ -227,6 +242,10 @@
                 this.setupEventListeners();
                 this.updateMusicButton();
                 this.animateSubTitle();
+                const savedLevel = this.loadProgress();
+                if (savedLevel > 1) {
+                    this.loadLevel(savedLevel);
+                }
             }
 
             static animateSubTitle() {
@@ -242,15 +261,19 @@
                 }, 2000);
             }
 
+            static debounce(func, wait) {
+                let timeout;
+                return function (...args) {
+                    clearTimeout(timeout);
+                    timeout = setTimeout(() => func.apply(this, args), wait);
+                };
+            }
+
             static setupEventListeners() {
                 const startBtn = document.getElementById('start-btn');
                 const musicToggle = document.getElementById('music-toggle');
-                
-                startBtn.addEventListener('click', () => this.startGame());
-                startBtn.addEventListener('touchstart', () => this.startGame());
-
-                musicToggle.addEventListener('click', () => this.toggleMusic());
-                musicToggle.addEventListener('touchstart', () => this.toggleMusic());
+                startBtn.addEventListener('click', this.debounce(() => this.startGame(), 300));
+                musicToggle.addEventListener('click', this.debounce(() => this.toggleMusic(), 300));
             }
 
             static startGame() {
@@ -275,9 +298,7 @@
                 }
 
                 dialogBox.innerHTML = `<button class="pixel-button" id="start-game-btn">開始挑戰！</button>`;
-                const startGameBtn = document.getElementById('start-game-btn');
-                startGameBtn.addEventListener('click', () => this.loadLevel(1));
-                startGameBtn.addEventListener('touchstart', () => this.loadLevel(1));
+                this.bindButton('#start-game-btn', () => this.loadLevel(1));
             }
 
             static typeText(container, text) {
@@ -301,11 +322,34 @@
                 }
                 const sound = this.soundCache.get(soundId);
                 sound.currentTime = 0;
-                sound.play().catch(console.error);
+                if (this.isMusicPlaying) {
+                    sound.play().catch(() => {
+                        console.warn(`音效 ${soundId} 播放失敗，可能需要用戶交互`);
+                    });
+                }
+            }
+
+            static loadImage(src, altSrc) {
+                const img = document.createElement('img');
+                img.src = src;
+                img.alt = src.split('/').pop();
+                img.style.width = '120px';
+                img.onerror = () => {
+                    img.src = altSrc || 'placeholder.png';
+                    console.warn(`圖片 ${src} 加載失敗，使用備用圖片`);
+                };
+                return img;
             }
 
             static switchBGM(bgmId) {
-                this.bgm.pause();
+                const bgms = ['bgm', 'electronic-bgm'];
+                bgms.forEach(id => {
+                    const audio = document.getElementById(id);
+                    if (audio !== this.bgm) {
+                        audio.pause();
+                        audio.currentTime = 0;
+                    }
+                });
                 this.bgm = document.getElementById(bgmId);
                 this.bgm.volume = 0.3;
                 if (this.isMusicPlaying) {
@@ -327,8 +371,46 @@
                 document.getElementById('music-toggle').innerHTML = this.isMusicPlaying ? "🔊" : "🔇";
             }
 
+            static bindButton(selector, callback) {
+                const buttons = document.querySelectorAll(selector);
+                buttons.forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        this.playSound('click-sfx');
+                        callback(btn);
+                    });
+                    btn.addEventListener('keydown', e => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            this.playSound('click-sfx');
+                            callback(btn);
+                        }
+                    });
+                });
+            }
+
+            static saveProgress() {
+                localStorage.setItem('gameProgress', JSON.stringify({
+                    currentLevel: this.currentLevel,
+                    score: this.score,
+                    wisdomPoints: this.wisdomPoints
+                }));
+            }
+
+            static loadProgress() {
+                const progress = localStorage.getItem('gameProgress');
+                if (progress) {
+                    const { currentLevel, score, wisdomPoints } = JSON.parse(progress);
+                    this.currentLevel = currentLevel;
+                    this.score = score;
+                    this.wisdomPoints = wisdomPoints;
+                    return currentLevel;
+                }
+                return 1;
+            }
+
             static loadLevel(levelId) {
                 this.currentLevel = levelId;
+                this.saveProgress();
                 document.getElementById('title-screen').classList.remove('active');
                 this.clearLevelContainer();
 
@@ -352,19 +434,33 @@
             }
 
             static showEnding() {
-                const endingHtml = `
-                    <div class="header">遊戲結束</div>
-                    <div class="dialog-box">
-                        <h2>${this.getEndingTitle()}</h2>
-                        <img src="${this.score >= 400 ? '呱呱_開心.png' : '呱呱_受傷.png'}" alt="結局角色" style="width:200px;margin:20px">
-                        <p>${this.getEndingText()}</p>
-                        <p>最終分數：${this.score} 分 | 智慧點數：${this.wisdomPoints}</p>
-                        <p style="color: #ff4500; font-weight: bold;">如遇詐騙，請撥打 165 反詐騙專線求助！</p>
-                        <button onclick="location.reload()" class="pixel-button">再玩一次</button>
-                    </div>
-                `;
+                const fragment = document.createDocumentFragment();
+                const header = document.createElement('div');
+                header.className = 'header';
+                header.textContent = '遊戲結束';
+                const dialogBox = document.createElement('div');
+                dialogBox.className = 'dialog-box';
+                const h2 = document.createElement('h2');
+                h2.textContent = this.getEndingTitle();
+                const img = this.loadImage(this.score >= 400 ? '呱呱_開心.png' : '呱呱_受傷.png', 'placeholder.png');
+                img.style.width = '200px';
+                img.style.margin = '20px';
+                const p1 = document.createElement('p');
+                p1.textContent = this.getEndingText();
+                const p2 = document.createElement('p');
+                p2.textContent = `最終分數：${this.score} 分 | 智慧點數：${this.wisdomPoints}`;
+                const p3 = document.createElement('p');
+                p3.style.color = '#ff4500';
+                p3.style.fontWeight = 'bold';
+                p3.textContent = '如遇詐騙，請撥打 165 反詐騙專線求助！';
+                const btn = document.createElement('button');
+                btn.className = 'pixel-button';
+                btn.textContent = '再玩一次';
+                btn.addEventListener('click', () => location.reload());
+                dialogBox.append(h2, img, p1, p2, p3, btn);
+                fragment.append(header, dialogBox);
                 this.switchBGM('bgm');
-                document.getElementById('level-container').innerHTML = endingHtml;
+                document.getElementById('level-container').appendChild(fragment);
             }
 
             static getEndingTitle() {
@@ -382,27 +478,26 @@
         class VoiceScamLevel {
             static init() {
                 const container = document.getElementById('level-container');
-                container.innerHTML = `
-                    <div class="header">第一關：語音詐騙</div>
-                    <div class="dialog-box">
-                        <p>📞「喂！同學，我是阿牛教授，你的學分有問題，馬上轉帳 5 萬給我，我保證不當掉你！」</p>
-                        <p style="color: #666;">呱呱：這聲音聽起來怪怪的，是教授嗎？</p>
-                        <div class="options">
-                            <buttondata-choice="1">🤔 用錢換學分好像不錯</button>
-                            <button data-choice="2">🚨 掛斷並報警</button>
-                        </div>
+                const fragment = document.createDocumentFragment();
+                const header = document.createElement('div');
+                header.className = 'header';
+                header.textContent = '第一關：語音詐騙';
+                const dialogBox = document.createElement('div');
+                dialogBox.className = 'dialog-box';
+                dialogBox.innerHTML = `
+                    <p>📞「喂！同學，我是阿牛教授，你的學分有問題，馬上轉帳 5 萬給我，我保證不當掉你！」</p>
+                    <p style="color: #666;">呱呱：這聲音聽起來怪怪的，是教授嗎？</p>
+                    <div class="options">
+                        <button data-choice="1">🤔 用錢換學分好像不錯</button>
+                        <button data-choice="2">🚨 掛斷並報警</button>
                     </div>
-                    <img src="詐騙狐狸.png" alt="詐騙者" style="width:120px;">
                 `;
-
-                container.querySelectorAll('[data-choice]').forEach(btn => {
-                    btn.addEventListener('click', e => this.handleChoice(e.target.dataset.choice));
-                    btn.addEventListener('touchstart', e => this.handleChoice(e.target.dataset.choice));
-                });
+                fragment.append(header, dialogBox, GameState.loadImage('詐騙狐狸.png', 'placeholder.png'));
+                container.appendChild(fragment);
+                GameState.bindButton('[data-choice]', btn => this.handleChoice(btn.dataset.choice));
             }
 
             static handleChoice(choice) {
-                GameState.playSound('click-sfx');
                 if (choice === '2') {
                     GameState.score += 100;
                     GameState.wisdomPoints += 10;
@@ -414,13 +509,20 @@
 
             static showDamageEffect() {
                 const container = document.getElementById('level-container');
-                container.innerHTML = `
-                    <div class="header">第一關：語音詐騙</div>
-                    <div class="dialog-box damage-effect">
-                        <img src="money_loss.png" alt="金錢損失" style="width:100px">
-                        <p>💸 損失新台幣 30,000 元！呱呱：怎麼會這樣...</p>
-                    </div>
-                `;
+                const fragment = document.createDocumentFragment();
+                const header = document.createElement('div');
+                header.className = 'header';
+                header.textContent = '第一關：語音詐騙';
+                const dialogBox = document.createElement('div');
+                dialogBox.className = 'dialog-box damage-effect';
+                const img = GameState.loadImage('money_loss.png', 'placeholder.png');
+                img.style.width = '100px';
+                const p = document.createElement('p');
+                p.innerHTML = '💸 損失新台幣 30,000 元！呱呱：怎麼會這樣...';
+                dialogBox.append(img, p);
+                fragment.append(header, dialogBox);
+                container.innerHTML = '';
+                container.appendChild(fragment);
                 GameState.playSound('loss-sfx');
                 setTimeout(() => GameState.loadLevel(1), 2000);
             }
@@ -430,16 +532,23 @@
             static init() {
                 GameState.switchBGM('electronic-bgm');
                 const container = document.getElementById('level-container');
-                container.innerHTML = `
-                    <div class="header">第二關：影像詐騙挑戰</div>
-                    <div class="dialog-box">
-                        <p>呱呱：這裡是虛擬網路空間，充滿 Deepfake 假影片！快用防詐槍擊落它們！</p>
-                        <p style="color: #666;">提示：注意嘴型與眨眼是否異常！</p>
-                        <div id="timer">剩餘時間：10秒</div>
-                        <div class="shoot-area" id="shoot-area"></div>
-                    </div>
-                    <img src="呱呱.PNG" alt="呱呱" class="frog">
+ In the HTML structure, we can append the content using a DocumentFragment to improve performance
+                const fragment = document.createDocumentFragment();
+                const header = document.createElement('div');
+                header.className = 'header';
+                header.textContent = '第二關：影像詐騙挑戰';
+                const dialogBox = document.createElement('div');
+                dialogBox.className = 'dialog-box';
+                dialogBox.innerHTML = `
+                    <p>呱呱：這裡是虛擬網路空間，充滿 Deepfake 假影片！快用防詐槍擊落它們！</p>
+                    <p style="color: #666;">提示：注意嘴型與眨眼是否異常！</p>
+                    <div id="timer">剩餘時間：10秒</div>
+                    <div class="shoot-area" id="shoot-area"></div>
                 `;
+                const img = GameState.loadImage('呱呱.PNG', 'placeholder.png');
+                img.className = 'frog';
+                fragment.append(header, dialogBox, img);
+                container.appendChild(fragment);
 
                 let timeLeft = 10;
                 let shotsFired = 0;
@@ -466,11 +575,16 @@
                     btn.textContent = item.text;
                     btn.dataset.isFake = item.isFake;
                     btn.addEventListener('click', () => this.handleShot(btn, shotsFired++, maxShots, timer));
-                    btn.addEventListener('touchstart', () => this.handleShot(btn, shotsFired++, maxShots, timer));
+                    btn.addEventListener('keydown', e => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            this.handleShot(btn, shotsFired++, maxShots, timer);
+                        }
+                    });
                     shootArea.appendChild(btn);
                 });
 
-                setTimeout(() => this.startBossFight(), 5000); // 5秒後進入Boss戰
+                setTimeout(() => this.startBossFight(), 5000);
             }
 
             static handleShot(btn, shotsFired, maxShots, timer) {
@@ -488,15 +602,21 @@
 
             static startBossFight() {
                 const container = document.getElementById('level-container');
-                container.innerHTML = `
-                    <div class="header">Boss戰：AI詐騙大師</div>
-                    <div class="dialog-box">
-                        <p>AI詐騙大師：哈哈，我是網路世界的影帝，你能擊敗我嗎？</p>
-                        <p>呱呱：看我用防詐槍收拾你！</p>
-                        <div id="timer">剩餘時間：5秒</div>
-                        <div class="shoot-area" id="boss-area"></div>
-                    </div>
+                const fragment = document.createDocumentFragment();
+                const header = document.createElement('div');
+                header.className = 'header';
+                header.textContent = 'Boss戰：AI詐騙大師';
+                const dialogBox = document.createElement('div');
+                dialogBox.className = 'dialog-box';
+                dialogBox.innerHTML = `
+                    <p>AI詐騙大師：哈哈，我是網路世界的影帝，你能擊敗我嗎？</p>
+                    <p>呱呱：看我用防詐槍收拾你！</p>
+                    <div id="timer">剩餘時間：5秒</div>
+                    <div class="shoot-area" id="boss-area"></div>
                 `;
+                fragment.append(header, dialogBox);
+                container.innerHTML = '';
+                container.appendChild(fragment);
                 GameState.playSound('boss-sfx');
 
                 let timeLeft = 5;
@@ -531,6 +651,19 @@
                             this.checkBossResult(correctShots);
                         }
                     });
+                    btn.addEventListener('keydown', e => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            GameState.playSound('shoot-sfx');
+                            btn.disabled = true;
+                            btn.style.background = item.isFake ? '#32cd32' : '#ff4500';
+                            if (item.isFake) correctShots++;
+                            if (correctShots >= 2) {
+                                clearInterval(timer);
+                                this.checkBossResult(correctShots);
+                            }
+                        }
+                    });
                     bossArea.appendChild(btn);
                 });
             }
@@ -547,7 +680,7 @@
 
             static checkBossResult(correctShots) {
                 if (correctShots >= 2) {
-                    GameState.score += 50; // Boss戰額外獎勵
+                    GameState.score += 50;
                     GameState.loadLevel(3);
                 } else {
                     this.showDamageEffect();
@@ -556,12 +689,18 @@
 
             static showDamageEffect() {
                 const container = document.getElementById('level-container');
-                container.innerHTML = `
-                    <div class="header">第二關：影像詐騙挑戰</div>
-                    <div class="dialog-box damage-effect">
-                        <p>💸 Deepfake 騙走了新台幣 50,000 元！呱呱：我的學費...</p>
-                    </div>
-                `;
+                const fragment = document.createDocumentFragment();
+                const header = document.createElement('div');
+                header.className = 'header';
+                header.textContent = '第二關：影像詐騙挑戰';
+                const dialogBox = document.createElement('div');
+                dialogBox.className = 'dialog-box damage-effect';
+                const p = document.createElement('p');
+                p.textContent = '💸 Deepfake 騙走了新台幣 50,000 元！呱呱：我的學費...';
+                dialogBox.appendChild(p);
+                fragment.append(header, dialogBox);
+                container.innerHTML = '';
+                container.appendChild(fragment);
                 GameState.playSound('loss-sfx');
                 setTimeout(() => GameState.loadLevel(2), 2000);
             }
@@ -571,21 +710,25 @@
             static init() {
                 GameState.switchBGM('bgm');
                 const container = document.getElementById('level-container');
-                container.innerHTML = `
-                    <div class="header">第三關：AI投資詐騙</div>
-                    <div class="dialog-box">
-                        <p>呱呱：這個投資平台說一個月賺 300%，我夢想當投資大師！</p>
-                        <p>檢查以下線索，找出詐騙證據！</p>
-                        <div class="invest-clues" id="clues">
-                            <div class="invest-clue" data-type="fake">過高報酬率 (300%/月)</div>
-                            <div class="invest-clue" data-type="fake">假用戶評價</div>
-                            <div class="invest-clue" data-type="real">官方認證標誌</div>
-                        </div>
-                        <button class="invest-btn" id="invest">💰 立刻投資</button>
-                        <button class="invest-btn" id="report">🚩 檢舉平台</button>
+                const fragment = document.createDocumentFragment();
+                const header = document.createElement('div');
+                header.className = 'header';
+                header.textContent = '第三關：AI投資詐騙';
+                const dialogBox = document.createElement('div');
+                dialogBox.className = 'dialog-box';
+                dialogBox.innerHTML = `
+                    <p>呱呱：這個投資平台說一個月賺 300%，我夢想當投資大師！</p>
+                    <p>檢查以下線索，找出詐騙證據！</p>
+                    <div class="invest-clues" id="clues">
+                        <div class="invest-clue" data-type="fake">過高報酬率 (300%/月)</div>
+                        <div class="invest-clue" data-type="fake">假用戶評價</div>
+                        <div class="invest-clue" data-type="real">官方認證標誌</div>
                     </div>
-                    <img src="詐騙狐狸.png" alt="詐騙者" style="width:120px;">
+                    <button class="invest-btn" id="invest">💰 立刻投資</button>
+                    <button class="invest-btn" id="report">🚩 檢舉平台</button>
                 `;
+                fragment.append(header, dialogBox, GameState.loadImage('詐騙狐狸.png', 'placeholder.png'));
+                container.appendChild(fragment);
 
                 let fakeCluesFound = 0;
                 document.querySelectorAll('.invest-clue').forEach(clue => {
@@ -598,14 +741,25 @@
                             clue.style.background = '#32cd32';
                         }
                     });
+                    clue.addEventListener('keydown', e => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            if (clue.dataset.type === 'fake') {
+                                clue.style.background = '#ff4500';
+                                fakeCluesFound++;
+                                GameState.wisdomPoints += 5;
+                            } else {
+                                clue.style.background = '#32cd32';
+                            }
+                        }
+                    });
                 });
 
-                document.getElementById('invest').addEventListener('click', () => this.handleChoice('invest'));
-                document.getElementById('report').addEventListener('click', () => this.handleChoice('report', fakeCluesFound));
+                GameState.bindButton('#invest', () => this.handleChoice('invest', fakeCluesFound));
+                GameState.bindButton('#report', () => this.handleChoice('report', fakeCluesFound));
             }
 
             static handleChoice(choice, fakeCluesFound = 0) {
-                GameState.playSound('click-sfx');
                 if (choice === 'report' && fakeCluesFound >= 2) {
                     GameState.score += 100;
                     GameState.loadLevel(4);
@@ -616,12 +770,18 @@
 
             static showDamageEffect() {
                 const container = document.getElementById('level-container');
-                container.innerHTML = `
-                    <div class="header">第三關：AI投資詐騙</div>
-                    <div class="dialog-box damage-effect">
-                        <p>💸 你投入 40,000 元全沒了！呱呱：我的投資夢碎了...</p>
-                    </div>
-                `;
+                const fragment = document.createDocumentFragment();
+                const header = document.createElement('div');
+                header.className = 'header';
+                header.textContent = '第三關：AI投資詐騙';
+                const dialogBox = document.createElement('div');
+                dialogBox.className = 'dialog-box damage-effect';
+                const p = document.createElement('p');
+                p.textContent = '💸 你投入 40,000 元全沒了！呱呱：我的投資夢碎了...';
+                dialogBox.appendChild(p);
+                fragment.append(header, dialogBox);
+                container.innerHTML = '';
+                container.appendChild(fragment);
                 GameState.playSound('loss-sfx');
                 setTimeout(() => GameState.loadLevel(3), 2000);
             }
@@ -631,30 +791,38 @@
             static init() {
                 GameState.switchBGM('bgm');
                 const container = document.getElementById('level-container');
-                container.innerHTML = `
-                    <div class="header">第四關：文字詐騙挑戰</div>
-                    <div class="dialog-box">
-                        <p>呱呱：室友點了假連結，電腦中毒了！幫我分類這些訊息吧！</p>
-                        <p style="color: #666;">提示：檢查網址與拼字是否可疑！</p>
-                        <div id="drag-items">
-                            <div class="drag-item" draggable="true" data-type="fake">[緊急] 密碼外洩，點擊重置</div>
-                            <div class="drag-item" draggable="true" data-type="real">系統通知：密碼更新成功</div>
-                            <div class="drag-item" draggable="true" data-type="fake">帳戶鎖定，立即解鎖</div>
-                        </div>
-                        <div class="drag-area">
-                            <div class="drop-zone" id="fake-zone">詐騙訊息</div>
-                            <div class="drop-zone" id="real-zone">真實公告</div>
-                        </div>
+                const fragment = document.createDocumentFragment();
+                const header = document.createElement('div');
+                header.className = 'header';
+                header.textContent = '第四關：文字詐騙挑戰';
+                const dialogBox = document.createElement('div');
+                dialogBox.className = 'dialog-box';
+                dialogBox.innerHTML = `
+                    <p>呱呱：室友點了假連結，電腦中毒了！幫我分類這些訊息吧！</p>
+                    <p style="color: #666;">提示：檢查網址與拼字是否可疑！</p>
+                    <div id="drag-items">
+                        <div class="drag-item" draggable="true" data-type="fake">[緊急] 密碼外洩，點擊重置</div>
+                        <div class="drag-item" draggable="true" data-type="real">系統通知：密碼更新成功</div>
+                        <div class="drag-item" draggable="true" data-type="fake">帳戶鎖定，立即解鎖</div>
                     </div>
-                    <img src="呱呱.PNG" alt="呱呱" class="frog">
+                    <div class="drag-area">
+                        <div class="drop-zone" id="fake-zone">詐騙訊息</div>
+                        <div class="drop-zone" id="real-zone">真實公告</div>
+                    </div>
                 `;
+                const img = GameState.loadImage('呱呱.PNG', 'placeholder.png');
+                img.className = 'frog';
+                fragment.append(header, dialogBox, img);
+                container.appendChild(fragment);
 
                 const dragItems = document.querySelectorAll('.drag-item');
                 const fakeZone = document.getElementById('fake-zone');
                 const realZone = document.getElementById('real-zone');
                 let correctDrops = 0;
 
+                // PC拖放支持
                 dragItems.forEach(item => {
+                    item.setAttribute('draggable', true);
                     item.addEventListener('dragstart', e => e.dataTransfer.setData('text', item.dataset.type));
                 });
 
@@ -677,16 +845,80 @@
                         }
                     });
                 });
+
+                // 移動設備觸控支持
+                dragItems.forEach(item => {
+                    item.addEventListener('touchstart', e => {
+                        e.preventDefault();
+                        item.classList.add('dragging');
+                        item.style.opacity = '0.7';
+                    });
+                    item.addEventListener('touchmove', e => {
+                        const touch = e.touches[0];
+                        item.style.position = 'absolute';
+                        item.style.left = `${touch.pageX - item.offsetWidth / 2}px`;
+                        item.style.top = `${touch.pageY - item.offsetHeight / 2}px`;
+                    });
+                    item.addEventListener('touchend', e => {
+                        item.classList.remove('dragging');
+                        item.style.opacity = '1';
+                        item.style.position = '';
+                        item.style.left = '';
+                        item.style.top = '';
+                        const touch = e.changedTouches[0];
+                        const fakeZoneRect = fakeZone.getBoundingClientRect();
+                        const realZoneRect = realZone.getBoundingClientRect();
+                        const type = item.dataset.type;
+                        const isFake = type === 'fake';
+                        if (
+                            touch.clientX >= fakeZoneRect.left && touch.clientX <= fakeZoneRect.right &&
+                            touch.clientY >= fakeZoneRect.top && touch.clientY <= fakeZoneRect.bottom
+                        ) {
+                            if (isFake) {
+                                correctDrops++;
+                                GameState.wisdomPoints += 5;
+                                fakeZone.appendChild(item);
+                                if (correctDrops === 3) {
+                                    GameState.score += 100;
+                                    GameState.loadLevel(5);
+                                }
+                            } else {
+                                this.showDamageEffect();
+                            }
+                        } else if (
+                            touch.clientX >= realZoneRect.left && touch.clientX <= realZoneRect.right &&
+                            touch.clientY >= realZoneRect.top && touch.clientY <= realZoneRect.bottom
+                        ) {
+                            if (!isFake) {
+                                correctDrops++;
+                                GameState.wisdomPoints += 5;
+                                realZone.appendChild(item);
+                                if (correctDrops === 3) {
+                                    GameState.score += 100;
+                                    GameState.loadLevel(5);
+                                }
+                            } else {
+                                this.showDamageEffect();
+                            }
+                        }
+                    });
+                });
             }
 
             static showDamageEffect() {
                 const container = document.getElementById('level-container');
-                container.innerHTML = `
-                    <div class="header">第四關：文字詐騙挑戰</div>
-                    <div class="dialog-box damage-effect">
-                        <p>💸 你點了假連結，損失 20,000 元！呱呱：救命啊！</p>
-                    </div>
-                `;
+                const fragment = document.createDocumentFragment();
+                const header = document.createElement('div');
+                header.className = 'header';
+                header.textContent = '第四關：文字詐騙挑戰';
+                const dialogBox = document.createElement('div');
+                dialogBox.className = 'dialog-box damage-effect';
+                const p = document.createElement('p');
+                p.textContent = '💸 你點了假連結，損失 20,000 元！呱呱：救命啊！';
+                dialogBox.appendChild(p);
+                fragment.append(header, dialogBox);
+                container.innerHTML = '';
+                container.appendChild(fragment);
                 GameState.playSound('loss-sfx');
                 setTimeout(() => GameState.loadLevel(4), 2000);
             }
